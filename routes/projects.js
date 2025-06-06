@@ -62,6 +62,28 @@ router.get('/', authMiddleware, async (req, res) => {
     }
 });
 
+// Get projects assigned to current user
+router.get('/assigned', authMiddleware, async (req, res) => {
+    try {
+        const userId = req.user.id; // Get the authenticated user's ID
+        
+        const projects = await Project.find({
+            'assignedUsers': userId
+        }).populate('assignedUsers', 'name username');
+        
+        res.json({
+            success: true,
+            projects: projects
+        });
+    } catch (error) {
+        console.error('Error getting assigned projects:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error getting assigned projects'
+        });
+    }
+});
+
 // Crear nuevo proyecto
 router.post('/', authMiddleware, async (req, res) => {
     try {

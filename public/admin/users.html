@@ -58,35 +58,39 @@
     </div>
 
     <!-- Modal for creating user -->
-    <div class="modal" id="createUserModal">
-        <div class="modal-content">
-            <button type="button" class="close" aria-label="Close">&times;</button>
-            <h2>Create New User</h2>
-            <form id="createUserForm">
-                <div class="mb-3">
-                    <label for="name" class="form-label">Name</label>
-                    <input type="text" class="form-control" id="name" required>
+    <div class="modal fade" id="createUserModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Create User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="mb-3">
-                    <label for="username" class="form-label">Username</label>
-                    <input type="text" class="form-control" id="username" required>
-                </div>
-                <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="password" required>
-                </div>
-                <div class="mb-3">
-                    <label for="bio" class="form-label">Bio</label>
-                    <textarea class="form-control" id="bio"></textarea>
-                </div>
-                <div class="mb-3">
-                    <label class="form-check-label">
-                        <input type="checkbox" class="form-check-input" id="isAdmin">
-                        Is administrator
-                    </label>
-                </div>
-                <button type="submit" class="btn btn-primary">Create User</button>
-            </form>
+                <form id="createUserForm">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="bio" class="form-label">Bio</label>
+                        <textarea class="form-control" id="bio"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-check-label">
+                            <input type="checkbox" class="form-check-input" id="isAdmin">
+                            Is administrator
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">Create</button>
+                </form>
+            </div>
         </div>
     </div>
 

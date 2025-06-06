@@ -16,10 +16,51 @@ const createUserForm = document.getElementById('createUserForm');
 const usersList = document.getElementById('usersList');
 
 // Initialize modal
-const userModal = new Modal('createUserModal');
+const userModal = new Modal('createUserModal', {
+    onClose: () => {
+        createUserForm.dataset.editingId = '';
+        document.getElementById('modalTitle').textContent = 'Create User';
+        document.getElementById('submitBtn').textContent = 'Create';
+    }
+});
 
 // Event Listeners
-createUserBtn.addEventListener('click', () => userModal.open());
+createUserBtn.addEventListener('click', () => {
+    document.getElementById('modalTitle').textContent = 'Create User';
+    document.getElementById('submitBtn').textContent = 'Create';
+    userModal.open();
+});
+
+// Edit user function
+async function editUser(userId) {
+    try {
+        const response = await fetch(`/api/users/${userId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        const user = await response.json();
+
+        // Fill form with user data
+        document.getElementById('name').value = user.name;
+        document.getElementById('username').value = user.username;
+        document.getElementById('bio').value = user.bio || '';
+        document.getElementById('isAdmin').checked = user.isAdmin;
+
+        // Update modal title and button
+        document.getElementById('modalTitle').textContent = 'Edit User';
+        document.getElementById('submitBtn').textContent = 'Save Changes';
+
+        // Store editing ID
+        createUserForm.dataset.editingId = userId;
+
+        // Show modal
+        userModal.open();
+    } catch (error) {
+        console.error('Error loading user:', error);
+        alert('Error loading user data');
+    }
+}
 
 createUserForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -27,13 +68,23 @@ createUserForm.addEventListener('submit', async (e) => {
     const userData = {
         name: document.getElementById('name').value,
         username: document.getElementById('username').value,
-        password: document.getElementById('password').value,
         bio: document.getElementById('bio').value,
         isAdmin: document.getElementById('isAdmin').checked
     };
 
+    // Only include password for new users
+    if (!createUserForm.dataset.editingId) {
+        userData.password = document.getElementById('password').value;
+    }
+
+    const editingId = createUserForm.dataset.editingId;
+    const isEditing = Boolean(editingId);
+
     try {
-        const response = await fetch('/api/users', {
+        const url = isEditing ? `/api/users/${editingId}` : '/api/users';
+        const method = isEditing ? 'PUT' : 'POST';
+
+        const response = await fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

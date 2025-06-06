@@ -12,12 +12,32 @@ router.post('/login', async (req, res) => {
         // Check if it's the admin user
         if (username === config.ADMIN_CREDENTIALS.username && 
             password === config.ADMIN_CREDENTIALS.password) {
+            // Find or create admin user in the database
+            let adminUser = await User.findOne({ username: config.ADMIN_CREDENTIALS.username });
+            
+            if (!adminUser) {
+                adminUser = new User({
+                    username: config.ADMIN_CREDENTIALS.username,
+                    name: 'Administrator',
+                    isAdmin: true
+                });
+                await adminUser.save();
+            }
+            
             const token = jwt.sign(
-                { id: 'admin', isAdmin: true },
+                { id: adminUser._id, isAdmin: true },
                 config.JWT_SECRET,
                 { expiresIn: '24h' }
             );
-            return res.json({ token, user: { username, isAdmin: true } });
+            
+            return res.json({
+                token,
+                user: {
+                    _id: adminUser._id,
+                    username: adminUser.username,
+                    isAdmin: true
+                }
+            });
         }
 
         // Check regular user
@@ -37,7 +57,14 @@ router.post('/login', async (req, res) => {
             { expiresIn: '24h' }
         );
 
-        res.json({ token, user: { username: user.username, isAdmin: user.isAdmin } });
+        res.json({
+            token,
+            user: {
+                _id: user._id,
+                username: user.username,
+                isAdmin: user.isAdmin
+            }
+        });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Error del servidor' });
