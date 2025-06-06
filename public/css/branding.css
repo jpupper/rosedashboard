@@ -124,28 +124,27 @@ h1, h2, h3, h4, h5, h6 {
 .btn-edit, .btn-delete {
     padding: 0.25rem 0.75rem;
     margin: 0 0.25rem;
+    background-color: var(--secondary-color);
 }
 
 .btn-edit {
-    background-color: var(--primary-color);
-    border-color: var(--primary-color);
-    color: var(--secondary-color);
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
 }
 
 .btn-edit:hover {
-    background-color: var(--secondary-color);
-    color: var(--primary-color);
-}
-
-.btn-delete {
     background-color: var(--primary-color);
-    border-color: var(--primary-color);
     color: var(--secondary-color);
 }
 
+.btn-delete {
+    border: 1px solid #dc3545;
+    color: #dc3545;
+}
+
 .btn-delete:hover {
-    background-color: var(--secondary-color);
-    color: var(--primary-color);
+    background-color: #dc3545;
+    color: var(--secondary-color);
 }
 
 /* Login styles */

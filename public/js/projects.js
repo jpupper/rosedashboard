@@ -116,8 +116,10 @@ function displayProjects(projects) {
                 ${project.assignedUsers?.map(user => user.name).join(', ') || 'No assignments'}
             </td>
             <td>
-                <button class="btn btn-sm btn-info" onclick="editProject('${project._id}')">Edit</button>
-                <button class="btn btn-sm btn-danger" onclick="deleteProject('${project._id}')">Delete</button>
+                <div class="btn-group">
+                    <button onclick="editProject('${project._id}')" class="btn btn-sm btn-edit">Edit</button>
+                    <button onclick="deleteProject('${project._id}')" class="btn btn-sm btn-delete">Delete</button>
+                </div>
             </td>
         </tr>
     `).join('');

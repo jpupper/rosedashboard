@@ -35,7 +35,7 @@ async function editUser(userId) {
         });
         const data = await response.json();
         
-        if (!data.success) {
+        if (!data.user) {
             throw new Error(data.message || 'Error loading user');
         }
         
@@ -146,8 +146,10 @@ function displayUsers(users) {
                 <small class="text-muted">${new Date(user.createdAt).toLocaleDateString()}</small>
             </td>
             <td>
-                <button class="btn btn-sm btn-outline-dark" onclick="editUser('${user._id}')">Edit</button>
-                <button class="btn btn-sm btn-outline-danger" onclick="deleteUser('${user._id}')">Delete</button>
+                <div class="btn-group">
+                    <button onclick="editUser('${user._id}')" class="btn btn-sm btn-edit">Edit</button>
+                    <button onclick="deleteUser('${user._id}')" class="btn btn-sm btn-delete">Delete</button>
+                </div>
             </td>
         </tr>
     `).join('');
