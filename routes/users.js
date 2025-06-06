@@ -8,12 +8,33 @@ const config = require('../config');
 // Middleware para verificar el token
 const authMiddleware = async (req, res, next) => {
     try {
-        const token = req.header('Authorization').replace('Bearer ', '');
+        const token = req.header('Authorization')?.replace('Bearer ', '');
+        
+        if (!token) {
+            throw new Error('No token provided');
+        }
+
         const decoded = jwt.verify(token, config.JWT_SECRET);
-        req.user = decoded;
+        
+        if (!decoded || !decoded.id) {
+            throw new Error('Invalid token');
+        }
+
+        const user = await User.findById(decoded.id);
+
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        req.token = token;
+        req.user = user;
         next();
     } catch (error) {
-        res.status(401).json({ message: 'Please authenticate' });
+        console.error('Auth error:', error.message);
+        res.status(401).json({
+            success: false,
+            message: 'Please authenticate'
+        });
     }
 };
 
@@ -24,6 +45,86 @@ const adminMiddleware = (req, res, next) => {
     }
     next();
 };
+
+// Get current user profile
+router.get('/me', authMiddleware, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).select('-password');
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        res.json({
+            success: true,
+            user: user
+        });
+    } catch (error) {
+        console.error('Error getting user profile:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error getting user profile'
+        });
+    }
+});
+
+// Update current user profile
+router.put('/me', authMiddleware, async (req, res) => {
+    try {
+        const { name, username, password, role, bio } = req.body;
+        const userId = req.user.id;
+
+        // Check if username is taken by another user
+        if (username) {
+            const existingUser = await User.findOne({ username, _id: { $ne: userId } });
+            if (existingUser) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Username already taken'
+                });
+            }
+        }
+
+        // Build update object
+        const updateData = {};
+        if (name) updateData.name = name;
+        if (username) updateData.username = username;
+        if (bio !== undefined) updateData.bio = bio;
+        if (role !== undefined) updateData.role = role;
+
+        // Handle password update
+        if (password) {
+            const salt = await bcrypt.genSalt(10);
+            updateData.password = await bcrypt.hash(password, salt);
+        }
+
+        const user = await User.findByIdAndUpdate(
+            userId,
+            updateData,
+            { new: true }
+        ).select('-password');
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        res.json({
+            success: true,
+            user: user
+        });
+    } catch (error) {
+        console.error('Error updating user profile:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error updating user profile'
+        });
+    }
+});
 
 // Obtener todos los usuarios (solo admin)
 router.get('/', authMiddleware, adminMiddleware, async (req, res) => {

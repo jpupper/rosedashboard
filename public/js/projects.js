@@ -4,12 +4,6 @@ if (!token) {
     window.location.href = '/';
 }
 
-// Logout function
-document.getElementById('logoutBtn').addEventListener('click', () => {
-    localStorage.removeItem('token');
-    window.location.href = '/';
-});
-
 // DOM Elements
 const createProjectBtn = document.getElementById('createProjectBtn');
 const createProjectForm = document.getElementById('createProjectForm');

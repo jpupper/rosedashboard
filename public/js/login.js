@@ -16,22 +16,17 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
         const data = await response.json();
 
         if (response.ok) {
-            // Store token
-            localStorage.setItem('token', data.token);
-            
-            // Redirect based on user role
             // Store user data
             localStorage.setItem('token', data.token);
             localStorage.setItem('isAdmin', data.user.isAdmin);
-            localStorage.setItem('userId', data.user._id || data.user.id); // Handle both _id and id formats
+            localStorage.setItem('userId', data.user._id || data.user.id);
             
-            // Store user data
-            localStorage.setItem('token', data.token);
-            localStorage.setItem('isAdmin', data.user.isAdmin);
-            localStorage.setItem('userId', data.user._id || data.user.id); // Handle both _id and id formats
-            
-            // Always redirect to profile first
-            window.location.href = '/profile.html';
+            // Redirect based on user type
+            if (data.user.isAdmin) {
+                window.location.href = '/admin/dashboard.html';
+            } else {
+                window.location.href = '/user/dashboard.html';
+            }
         } else {
             alert(data.message || 'Error al iniciar sesión');
         }
