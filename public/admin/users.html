@@ -1,11 +1,13 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Usuarios - Rose Dashboard</title>
+    <title>User Management - Rose Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="../css/styles.css" rel="stylesheet">
+    
+    <link href="../css/branding.css" rel="stylesheet">
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
@@ -20,21 +22,21 @@
                         <a class="nav-link" href="dashboard.html">Dashboard</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="users.html">Usuarios</a>
+                        <a class="nav-link active" href="users.html">Users</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="projects.html">Proyectos</a>
+                        <a class="nav-link" href="projects.html">Projects</a>
                     </li>
                 </ul>
-                <button class="btn btn-light" id="logoutBtn">Cerrar Sesión</button>
+                <button class="btn btn-light" id="logoutBtn">Logout</button>
             </div>
         </div>
     </nav>
 
     <div class="container mt-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>Gestión de Usuarios</h2>
-            <button class="btn btn-primary" id="createUserBtn">Crear Usuario</button>
+            <h2>User Management</h2>
+            <button class="btn btn-primary" id="createUserBtn">Create User</button>
         </div>
         
         <div class="card">
@@ -42,10 +44,10 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Nombre</th>
-                            <th>Usuario</th>
-                            <th>Rol</th>
-                            <th>Acciones</th>
+                            <th>Name</th>
+                            <th>Username</th>
+                            <th>Role</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="usersList">
@@ -55,22 +57,22 @@
         </div>
     </div>
 
-    <!-- Modal para crear usuario -->
+    <!-- Modal for creating user -->
     <div class="modal" id="createUserModal">
         <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Crear Nuevo Usuario</h2>
+            <button type="button" class="close" aria-label="Close">&times;</button>
+            <h2>Create New User</h2>
             <form id="createUserForm">
                 <div class="mb-3">
-                    <label for="name" class="form-label">Nombre</label>
+                    <label for="name" class="form-label">Name</label>
                     <input type="text" class="form-control" id="name" required>
                 </div>
                 <div class="mb-3">
-                    <label for="username" class="form-label">Usuario</label>
+                    <label for="username" class="form-label">Username</label>
                     <input type="text" class="form-control" id="username" required>
                 </div>
                 <div class="mb-3">
-                    <label for="password" class="form-label">Contraseña</label>
+                    <label for="password" class="form-label">Password</label>
                     <input type="password" class="form-control" id="password" required>
                 </div>
                 <div class="mb-3">
@@ -80,10 +82,10 @@
                 <div class="mb-3">
                     <label class="form-check-label">
                         <input type="checkbox" class="form-check-input" id="isAdmin">
-                        Es administrador
+                        Is administrator
                     </label>
                 </div>
-                <button type="submit" class="btn btn-primary">Crear Usuario</button>
+                <button type="submit" class="btn btn-primary">Create User</button>
             </form>
         </div>
     </div>

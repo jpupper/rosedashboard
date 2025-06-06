@@ -17,13 +17,37 @@ const closeBtn = createProjectModal.querySelector('.close');
 const createProjectForm = document.getElementById('createProjectForm');
 const projectsList = document.getElementById('projectsList');
 
+// Modal functions
+function openModal() {
+    createProjectModal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    loadUsersForAssignment();
+}
+
+function closeModal() {
+    createProjectModal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+    createProjectForm.reset();
+    createProjectForm.dataset.editingId = '';
+}
+
 // Event Listeners
-createProjectBtn.addEventListener('click', () => {
-    createProjectModal.classList.add('show');
+createProjectBtn.addEventListener('click', openModal);
+
+closeBtn.addEventListener('click', closeModal);
+
+// Close modal when clicking outside
+createProjectModal.addEventListener('click', (e) => {
+    if (e.target === createProjectModal) {
+        closeModal();
+    }
 });
 
-closeBtn.addEventListener('click', () => {
-    createProjectModal.classList.remove('show');
+// Close modal with Escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && createProjectModal.style.display === 'block') {
+        closeModal();
+    }
 });
 
 // Load users for project assignment
@@ -80,8 +104,7 @@ createProjectForm.addEventListener('submit', async (e) => {
             // Limpiar formulario y cerrar modal
             createProjectForm.reset();
             createProjectForm.dataset.editingId = ''; // Limpiar ID de edición
-            createProjectModal.classList.remove('show');
-            createProjectModal.style.display = 'none';
+            closeModal();
             
             // Recargar lista de proyectos
             loadProjects();
@@ -169,10 +192,7 @@ function setSelectedUsers(userIds) {
 // Load initial data
 loadProjects();
 
-// Cargar usuarios cuando se abre el modal
-createProjectBtn.addEventListener('click', () => {
-    loadUsersForAssignment();
-});
+// La carga de usuarios ahora se maneja en la función openModal
 
 // Editar proyecto
 async function editProject(projectId) {
@@ -193,8 +213,7 @@ async function editProject(projectId) {
         setSelectedUsers(project.assignedUsers.map(user => user._id));
 
         // Mostrar modal
-        createProjectModal.classList.add('show');
-        createProjectModal.style.display = 'block';
+        openModal();
 
         // Guardar el ID del proyecto que se está editando
         createProjectForm.dataset.editingId = projectId;

@@ -17,13 +17,35 @@ const closeBtn = createUserModal.querySelector('.close');
 const createUserForm = document.getElementById('createUserForm');
 const usersList = document.getElementById('usersList');
 
+// Modal functions
+function openModal() {
+    createUserModal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+    createUserModal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+    createUserForm.reset();
+}
+
 // Event Listeners
-createUserBtn.addEventListener('click', () => {
-    createUserModal.classList.add('show');
+createUserBtn.addEventListener('click', openModal);
+
+closeBtn.addEventListener('click', closeModal);
+
+// Close modal when clicking outside
+createUserModal.addEventListener('click', (e) => {
+    if (e.target === createUserModal) {
+        closeModal();
+    }
 });
 
-closeBtn.addEventListener('click', () => {
-    createUserModal.classList.remove('show');
+// Close modal with Escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && createUserModal.style.display === 'block') {
+        closeModal();
+    }
 });
 
 createUserForm.addEventListener('submit', async (e) => {
@@ -48,7 +70,7 @@ createUserForm.addEventListener('submit', async (e) => {
         });
 
         if (response.ok) {
-            createUserModal.classList.remove('show');
+            closeModal();
             createUserForm.reset();
             loadUsers();
         } else {
