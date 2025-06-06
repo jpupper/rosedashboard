@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const config = require('../config');
@@ -7,16 +8,12 @@ const config = require('../config');
 // Middleware para verificar el token
 const authMiddleware = async (req, res, next) => {
     try {
-        const token = req.headers.authorization?.split(' ')[1];
-        if (!token) {
-            return res.status(401).json({ message: 'No token provided' });
-        }
-
+        const token = req.header('Authorization').replace('Bearer ', '');
         const decoded = jwt.verify(token, config.JWT_SECRET);
         req.user = decoded;
         next();
     } catch (error) {
-        res.status(401).json({ message: 'Invalid token' });
+        res.status(401).json({ message: 'Please authenticate' });
     }
 };
 

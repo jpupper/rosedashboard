@@ -39,13 +39,24 @@ async function editUser(userId) {
                 'Authorization': `Bearer ${token}`
             }
         });
-        const user = await response.json();
+        const data = await response.json();
+        
+        if (!data.success) {
+            throw new Error(data.message || 'Error loading user');
+        }
+        
+        const user = data.user;
 
         // Fill form with user data
         document.getElementById('name').value = user.name;
         document.getElementById('username').value = user.username;
         document.getElementById('bio').value = user.bio || '';
-        document.getElementById('isAdmin').checked = user.isAdmin;
+        document.getElementById('role').value = user.role || 'other';
+        document.getElementById('access').value = user.isAdmin ? 'admin' : 'user';
+
+        // Hide password field for editing
+        document.getElementById('password').required = false;
+        document.getElementById('password').value = '';
 
         // Update modal title and button
         document.getElementById('modalTitle').textContent = 'Edit User';
@@ -69,7 +80,8 @@ createUserForm.addEventListener('submit', async (e) => {
         name: document.getElementById('name').value,
         username: document.getElementById('username').value,
         bio: document.getElementById('bio').value,
-        isAdmin: document.getElementById('isAdmin').checked
+        role: document.getElementById('role').value,
+        isAdmin: document.getElementById('access').value === 'admin'
     };
 
     // Only include password for new users
@@ -126,11 +138,22 @@ function displayUsers(users) {
     usersList.innerHTML = users.map(user => `
         <tr>
             <td>${user.name}</td>
-            <td>${user.username}</td>
-            <td>${user.isAdmin ? 'Administrador' : 'Usuario'}</td>
+            <td>@${user.username}</td>
+            <td>${user.role || '-'}</td>
             <td>
-                <button class="btn btn-sm btn-info" onclick="editUser('${user._id}')">Editar</button>
-                <button class="btn btn-sm btn-danger" onclick="deleteUser('${user._id}')">Eliminar</button>
+                <span class="badge ${user.isAdmin ? 'bg-dark' : 'bg-secondary'}">
+                    ${user.isAdmin ? 'Administrator' : 'User'}
+                </span>
+            </td>
+            <td>
+                <small class="text-muted">${user.bio || '-'}</small>
+            </td>
+            <td>
+                <small class="text-muted">${new Date(user.createdAt).toLocaleDateString()}</small>
+            </td>
+            <td>
+                <button class="btn btn-sm btn-outline-dark" onclick="editUser('${user._id}')">Edit</button>
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteUser('${user._id}')">Delete</button>
             </td>
         </tr>
     `).join('');
