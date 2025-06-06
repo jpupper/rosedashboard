@@ -12,43 +12,21 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
 
 // DOM Elements
 const createProjectBtn = document.getElementById('createProjectBtn');
-const createProjectModal = document.getElementById('createProjectModal');
-const closeBtn = createProjectModal.querySelector('.close');
 const createProjectForm = document.getElementById('createProjectForm');
 const projectsList = document.getElementById('projectsList');
 
-// Modal functions
-function openModal() {
-    createProjectModal.style.display = 'block';
-    document.body.style.overflow = 'hidden';
-    loadUsersForAssignment();
-}
-
-function closeModal() {
-    createProjectModal.style.display = 'none';
-    document.body.style.overflow = 'auto';
-    createProjectForm.reset();
-    createProjectForm.dataset.editingId = '';
-}
+// Initialize modal
+const projectModal = new Modal('createProjectModal', {
+    onOpen: () => loadUsersForAssignment(),
+    onClose: () => {
+        if (createProjectForm.dataset.editingId) {
+            createProjectForm.dataset.editingId = '';
+        }
+    }
+});
 
 // Event Listeners
-createProjectBtn.addEventListener('click', openModal);
-
-closeBtn.addEventListener('click', closeModal);
-
-// Close modal when clicking outside
-createProjectModal.addEventListener('click', (e) => {
-    if (e.target === createProjectModal) {
-        closeModal();
-    }
-});
-
-// Close modal with Escape key
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && createProjectModal.style.display === 'block') {
-        closeModal();
-    }
-});
+createProjectBtn.addEventListener('click', () => projectModal.open());
 
 // Load users for project assignment
 async function loadUsersForAssignment() {
@@ -104,17 +82,17 @@ createProjectForm.addEventListener('submit', async (e) => {
             // Limpiar formulario y cerrar modal
             createProjectForm.reset();
             createProjectForm.dataset.editingId = ''; // Limpiar ID de edición
-            closeModal();
+            projectModal.close();
             
             // Recargar lista de proyectos
             loadProjects();
         } else {
             const data = await response.json();
-            alert(data.message || 'Error al crear proyecto');
+            alert(data.message || 'Error creating project');
         }
     } catch (error) {
         console.error('Error:', error);
-        alert('Error al conectar con el servidor');
+        alert('Error connecting to server');
     }
 });
 
@@ -141,11 +119,11 @@ function displayProjects(projects) {
             <td>${project.createdBy?.name || 'Admin'}</td>
             <td>${new Date(project.createdAt).toLocaleDateString()}</td>
             <td>
-                ${project.assignedUsers?.map(user => user.name).join(', ') || 'Sin asignaciones'}
+                ${project.assignedUsers?.map(user => user.name).join(', ') || 'No assignments'}
             </td>
             <td>
-                <button class="btn btn-sm btn-info" onclick="editProject('${project._id}')">Editar</button>
-                <button class="btn btn-sm btn-danger" onclick="deleteProject('${project._id}')">Eliminar</button>
+                <button class="btn btn-sm btn-info" onclick="editProject('${project._id}')">Edit</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteProject('${project._id}')">Delete</button>
             </td>
         </tr>
     `).join('');
@@ -213,13 +191,13 @@ async function editProject(projectId) {
         setSelectedUsers(project.assignedUsers.map(user => user._id));
 
         // Mostrar modal
-        openModal();
+        projectModal.open();
 
         // Guardar el ID del proyecto que se está editando
         createProjectForm.dataset.editingId = projectId;
     } catch (error) {
         console.error('Error loading project:', error);
-        alert('Error al cargar el proyecto');
+        alert('Error loading project');
     }
 }
 

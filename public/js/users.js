@@ -12,41 +12,14 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
 
 // DOM Elements
 const createUserBtn = document.getElementById('createUserBtn');
-const createUserModal = document.getElementById('createUserModal');
-const closeBtn = createUserModal.querySelector('.close');
 const createUserForm = document.getElementById('createUserForm');
 const usersList = document.getElementById('usersList');
 
-// Modal functions
-function openModal() {
-    createUserModal.style.display = 'block';
-    document.body.style.overflow = 'hidden';
-}
-
-function closeModal() {
-    createUserModal.style.display = 'none';
-    document.body.style.overflow = 'auto';
-    createUserForm.reset();
-}
+// Initialize modal
+const userModal = new Modal('createUserModal');
 
 // Event Listeners
-createUserBtn.addEventListener('click', openModal);
-
-closeBtn.addEventListener('click', closeModal);
-
-// Close modal when clicking outside
-createUserModal.addEventListener('click', (e) => {
-    if (e.target === createUserModal) {
-        closeModal();
-    }
-});
-
-// Close modal with Escape key
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && createUserModal.style.display === 'block') {
-        closeModal();
-    }
-});
+createUserBtn.addEventListener('click', () => userModal.open());
 
 createUserForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -70,7 +43,7 @@ createUserForm.addEventListener('submit', async (e) => {
         });
 
         if (response.ok) {
-            closeModal();
+            userModal.close();
             createUserForm.reset();
             loadUsers();
         } else {
