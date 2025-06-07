@@ -33,66 +33,59 @@
                         </tr>
                     </thead>
                     <tbody id="clientsList">
-                        </tbody>
-                    </table>
-                </div>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
-                <!-- Create/Edit Client Modal -->
-                <div class="modal" id="createClientModal" tabindex="-1">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="modalTitle">Create Client</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <form id="createClientForm">
-                                    <div class="mb-3">
-                                        <label for="name" class="form-label">Client Name</label>
-                                        <input type="text" class="form-control" id="name" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="description" class="form-label">Description</label>
-                                        <textarea class="form-control" id="description" rows="3"></textarea>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="location" class="form-label">Location</label>
-                                        <input type="text" class="form-control" id="location" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="accountValue" class="form-label">Account Value</label>
-                                        <input type="number" class="form-control" id="accountValue" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Assigned Member</label>
-                                        <div id="usersList">
-                                            <!-- Users will be loaded here -->
-                                        </div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Client Contact</label>
-                                        <div class="card p-3">
-                                            <div class="mb-2">
-                                                <label for="contactName" class="form-label">Contact Name</label>
-                                                <input type="text" class="form-control" id="contactName" required>
-                                            </div>
-                                            <div class="mb-2">
-                                                <label for="contactEmail" class="form-label">Contact Email</label>
-                                                <input type="email" class="form-control" id="contactEmail">
-                                            </div>
-                                            <div class="mb-2">
-                                                <label for="contactPhone" class="form-label">Contact Phone</label>
-                                                <input type="tel" class="form-control" id="contactPhone">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary" id="submitBtn">Create</button>
-                                </form>
-                            </div>
+    <!-- Modal para crear cliente -->
+    <div class="modal" id="createClientModal">
+        <div class="modal-content">
+            <button type="button" class="close" aria-label="Close">&times;</button>
+            <h2 id="modalTitle">Create Client</h2>
+            <form id="createClientForm">
+                <div class="mb-3">
+                    <label for="clientName" class="form-label">Client Name</label>
+                    <input type="text" class="form-control" id="clientName" required>
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea class="form-control" id="description" rows="3" required></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="location" class="form-label">Location</label>
+                    <input type="text" class="form-control" id="location" required>
+                </div>
+                <div class="mb-3">
+                    <label for="accountValue" class="form-label">Account Value</label>
+                    <input type="number" class="form-control" id="accountValue" required>
+                </div>
+                <div class="mb-3">
+                    <label for="assignedMember" class="form-label">Assigned Member</label>
+                    <select class="form-select" id="assignedMember" required>
+                        <!-- Options will be loaded dynamically -->
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="clientContact" class="form-label">Client Contact</label>
+                    <div class="card p-3">
+                        <div class="mb-2">
+                            <label for="contactName" class="form-label">Contact Name</label>
+                            <input type="text" class="form-control" id="contactName" required>
+                        </div>
+                        <div class="mb-2">
+                            <label for="contactEmail" class="form-label">Contact Email</label>
+                            <input type="email" class="form-control" id="contactEmail">
+                        </div>
+                        <div class="mb-2">
+                            <label for="contactPhone" class="form-label">Contact Phone</label>
+                            <input type="tel" class="form-control" id="contactPhone">
                         </div>
                     </div>
                 </div>
-            </main>
+                <button type="submit" class="btn btn-primary" id="submitBtn">Create</button>
+            </form>
         </div>
     </div>
 
