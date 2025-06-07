@@ -3,17 +3,17 @@ function createUserMenu() {
     const menuHtml = `
         <nav class="navbar navbar-expand-lg navbar-dark">
             <div class="container-fluid">
-                <a class="navbar-brand" href="#">Rose Dashboard</a>
+                <a class="navbar-brand" href="${getPath('/')}">Rose Dashboard</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item">
-                            <a class="nav-link" href="/profile.html">Profile</a>
+                            <a class="nav-link" href="${window.appConfig.apiUrl}/profile.html">Profile</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/user/dashboard.html">My Projects</a>
+                            <a class="nav-link" href="${window.appConfig.apiUrl}/user/dashboard.html">My Projects</a>
                         </li>
                     </ul>
                     <button class="btn btn-light" id="logoutBtn">Logout</button>
@@ -26,9 +26,9 @@ function createUserMenu() {
     document.body.insertAdjacentHTML('afterbegin', menuHtml);
 
     // Set active menu item based on current page
-    const currentPage = window.location.pathname;
+    const currentUrl = window.location.href;
     document.querySelectorAll('.nav-link').forEach(link => {
-        if (link.getAttribute('href') === currentPage) {
+        if (currentUrl === link.getAttribute('href')) {
             link.classList.add('active');
         }
     });
@@ -38,7 +38,7 @@ function createUserMenu() {
         localStorage.removeItem('token');
         localStorage.removeItem('isAdmin');
         localStorage.removeItem('userId');
-        window.location.href = '/';
+        window.location.href = window.appConfig.apiUrl + '/';
     });
 }
 

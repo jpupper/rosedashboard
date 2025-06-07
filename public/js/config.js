@@ -1,11 +1,18 @@
 const config = {
     development: {
-        apiUrl: 'http://localhost:3343'
+        apiUrl: 'http://localhost:3343/rose',
+        basePath: '/rose'
     },
     production: {
-        apiUrl: 'https://vps-4455523-x.dattaweb.com/rose'
+        apiUrl: 'https://vps-4455523-x.dattaweb.com/rose',
+        basePath: '/rose'
     }
 };
+
+// Función para obtener la ruta completa
+function getPath(path) {
+    return `${currentConfig.basePath}${path}`;
+}
 
 // Cambiar esto según el entorno (development o production)
 const environment = 'development';

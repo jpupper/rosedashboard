@@ -5,7 +5,7 @@ const isAdmin = localStorage.getItem('isAdmin') === 'true';
 
 // Redirect if not authenticated or if admin
 if (!token || !userId || isAdmin) {
-    window.location.href = '/';
+    window.location.href = getPath('/');
 }
 
 // Logout function
@@ -13,14 +13,14 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
     localStorage.removeItem('token');
     localStorage.removeItem('isAdmin');
     localStorage.removeItem('userId');
-    window.location.href = '/';
+    window.location.href = getPath('/');
 });
 
 // Load user's projects
 async function loadUserProjects() {
     try {
         // Fetch only the projects assigned to the current user
-        const response = await fetch('/api/projects/assigned', {
+        const response = await fetch(`${window.appConfig.apiUrl}/api/projects/assigned`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }

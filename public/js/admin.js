@@ -1,20 +1,20 @@
 // Check if user is authenticated and is admin
 const token = localStorage.getItem('token');
 if (!token) {
-    window.location.href = '/';
+    window.location.href = getPath('/');
 }
 
 // Logout function
 document.getElementById('logoutBtn').addEventListener('click', () => {
     localStorage.removeItem('token');
-    window.location.href = '/';
+    window.location.href = getPath('/');
 });
 
 // Load users and projects
 async function loadData() {
     try {
         // Load users
-        const usersResponse = await fetch('/api/users', {
+        const usersResponse = await fetch(`${window.appConfig.apiUrl}/api/users`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -23,7 +23,7 @@ async function loadData() {
         displayUsers(users);
 
         // Load projects
-        const projectsResponse = await fetch('/api/projects', {
+        const projectsResponse = await fetch(`${window.appConfig.apiUrl}/api/projects`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }

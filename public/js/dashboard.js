@@ -1,19 +1,19 @@
 // Check if user is authenticated
 const token = localStorage.getItem('token');
 if (!token) {
-    window.location.href = '/';
+    window.location.href = getPath('/');
 }
 
 // Logout function
 document.getElementById('logoutBtn').addEventListener('click', () => {
     localStorage.removeItem('token');
-    window.location.href = '/';
+    window.location.href = getPath('/');
 });
 
 // Load projects
 async function loadProjects() {
     try {
-        const response = await fetch('/api/projects/user', {
+        const response = await fetch(`${window.appConfig.apiUrl}/api/projects/user`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }

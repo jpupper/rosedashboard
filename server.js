@@ -1,21 +1,75 @@
 const express = require('express');
+const app = express();
+const http = require('http').createServer(app);
+const path = require('path');
+const cors = require('cors');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const config = require('./config');
-const path = require('path');
 
 // Import models
-require('./models/User');
+const User = require('./models/User');
 require('./models/Project');
 
-const app = express();
+// Función para inicializar la base de datos
+async function initializeDatabase() {
+    try {
+        // Verificar si ya existe un usuario admin
+        const adminExists = await User.findOne({ username: config.ADMIN_CREDENTIALS.username });
+        
+        if (!adminExists) {
+            // Crear usuario admin
+            const bcrypt = require('bcryptjs');
+            const hashedPassword = await bcrypt.hash(config.ADMIN_CREDENTIALS.password, 10);
+            
+            const adminUser = new User({
+                name: 'Administrator',
+                username: config.ADMIN_CREDENTIALS.username,
+                password: hashedPassword,
+                isAdmin: true,
+                role: 'admin'
+            });
+
+            await adminUser.save();
+            console.log('Admin user created successfully');
+        } else {
+            console.log('Admin user already exists');
+        }
+    } catch (error) {
+        console.error('Error initializing database:', error);
+    }
+}
 
 const PORT = process.env.PORT || 3343;
-// Middleware
+
+// Import routes
+const authRoutes = require('./routes/auth');
+const userRoutes = require('./routes/users');
+const projectRoutes = require('./routes/projects');
+
+// Middlewares
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(express.static('public'));
+// Servir archivos estáticos con prefijo /rose
+app.use('/rose', express.static(path.join(__dirname, 'public')));
+
+// Use routes con prefijo /rose
+app.use('/rose/api/auth', authRoutes);
+app.use('/rose/api/users', userRoutes);
+app.use('/rose/api/projects', projectRoutes);
+
+// Ruta principal para /rose
+app.get('/rose', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 // Database connection
 mongoose.connect(config.MONGODB_URI, {
@@ -25,21 +79,25 @@ mongoose.connect(config.MONGODB_URI, {
 .then(() => console.log('Connected to MongoDB'))
 .catch(err => console.error('MongoDB connection error:', err));
 
-// Import routes
-const authRoutes = require('./routes/auth');
-const userRoutes = require('./routes/users');
-const projectRoutes = require('./routes/projects');
 
-// Use routes
-app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/projects', projectRoutes);
 
-// Serve static files
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
+// Función para iniciar el servidor
+async function startServer() {
+    try {
+        // Conectar a la base de datos
+        await mongoose.connect(config.MONGODB_URI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true
+        });
+        console.log('Connected to MongoDB');
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+        // Iniciar el servidor HTTP
+        http.listen(PORT, () => {
+            console.log(`Servidor escuchando en el puerto ${PORT}`);
+        });
+    } catch (error) {
+        console.error('Error al iniciar el servidor:', error);
+    }
+}
+
+startServer();

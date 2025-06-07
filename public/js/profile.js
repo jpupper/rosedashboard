@@ -1,7 +1,7 @@
 // Check authentication
 const token = localStorage.getItem('token');
 if (!token) {
-    window.location.href = '/';
+    window.location.href = window.appConfig.apiUrl + '/';
 }
 
 // Get DOM elements
@@ -108,7 +108,7 @@ logoutBtn.addEventListener('click', () => {
     localStorage.removeItem('token');
     localStorage.removeItem('isAdmin');
     localStorage.removeItem('userId');
-    window.location.href = '/';
+    window.location.href = window.appConfig.apiUrl + '/';
 });
 
 // Load initial data

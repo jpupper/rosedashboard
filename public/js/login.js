@@ -23,9 +23,9 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
             
             // Redirect based on user type
             if (data.user.isAdmin) {
-                window.location.href = '/admin/dashboard.html';
+                window.location.href = window.appConfig.apiUrl + '/admin/dashboard.html';
             } else {
-                window.location.href = '/user/dashboard.html';
+                window.location.href = window.appConfig.apiUrl + '/user/dashboard.html';
             }
         } else {
             alert(data.message || 'Error al iniciar sesión');
