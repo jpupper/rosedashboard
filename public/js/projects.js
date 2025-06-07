@@ -197,6 +197,32 @@ async function editProject(projectId) {
     }
 }
 
+// Delete project function
+async function deleteProject(projectId) {
+    if (!confirm('¿Estás seguro de que deseas eliminar este proyecto?')) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`${window.appConfig.apiUrl}/api/projects/${projectId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (response.ok) {
+            loadProjects(); // Recargar la lista de proyectos
+        } else {
+            const data = await response.json();
+            alert(data.message || 'Error al eliminar proyecto');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al conectar con el servidor');
+    }
+}
+
 // If we're in the create/edit form, load users
 if (document.getElementById('userCheckboxes')) {
     loadUsersForAssignment();

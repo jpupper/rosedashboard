@@ -33,13 +33,11 @@ async function editUser(userId) {
                 'Authorization': `Bearer ${token}`
             }
         });
-        const data = await response.json();
+        const user = await response.json();
         
-        if (!data.user) {
-            throw new Error(data.message || 'Error loading user');
+        if (!user || !user._id) {
+            throw new Error('Error loading user');
         }
-        
-        const user = data.user;
 
         // Fill form with user data
         document.getElementById('name').value = user.name;
@@ -153,6 +151,32 @@ function displayUsers(users) {
             </td>
         </tr>
     `).join('');
+}
+
+// Delete user function
+async function deleteUser(userId) {
+    /*if (!confirm('¿Estás seguro de que deseas eliminar este usuario?')) {
+        return;
+    }*/
+
+    try {
+        const response = await fetch(`${window.appConfig.apiUrl}/api/users/${userId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (response.ok) {
+            loadUsers(); // Recargar la lista de usuarios
+        } else {
+            const data = await response.json();
+            alert(data.message || 'Error al eliminar usuario');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al conectar con el servidor');
+    }
 }
 
 // Load initial data

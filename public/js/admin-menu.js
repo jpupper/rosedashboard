@@ -21,6 +21,9 @@ function createAdminMenu() {
                         <li class="nav-item">
                             <a class="nav-link" href="${window.appConfig.frontendUrl}/admin/projects.html">Projects</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="${window.appConfig.frontendUrl}/admin/clients.html">Clients</a>
+                        </li>
                     </ul>
                     <button class="btn btn-light" id="logoutBtn">Logout</button>
                 </div>
