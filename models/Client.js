@@ -19,11 +19,11 @@ const clientSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    assignedMember: {
+    assignedMembers: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
-    },
+    }],
     clientContact: {
         name: {
             type: String,

@@ -50,7 +50,7 @@ const adminMiddleware = (req, res, next) => {
 router.get('/', authMiddleware, adminMiddleware, async (req, res) => {
     try {
         const clients = await Client.find()
-            .populate('assignedMember', 'name username')
+            .populate('assignedMembers', 'name username')
             .populate('createdBy', 'name');
         res.json(clients);
     } catch (error) {
@@ -62,20 +62,20 @@ router.get('/', authMiddleware, adminMiddleware, async (req, res) => {
 // Crear nuevo cliente (solo admin)
 router.post('/', authMiddleware, adminMiddleware, async (req, res) => {
     try {
-        const { name, description, location, accountValue, assignedMember, clientContact } = req.body;
+        const { name, description, location, accountValue, assignedMembers, clientContact } = req.body;
 
         const client = new Client({
             name,
             description,
             location,
             accountValue,
-            assignedMember,
+            assignedMembers,
             clientContact,
             createdBy: req.user.id
         });
 
         await client.save();
-        await client.populate('assignedMember', 'name username');
+        await client.populate('assignedMembers', 'name username');
         await client.populate('createdBy', 'name');
         
         res.status(201).json(client);
@@ -89,7 +89,7 @@ router.post('/', authMiddleware, adminMiddleware, async (req, res) => {
 router.get('/:id', authMiddleware, adminMiddleware, async (req, res) => {
     try {
         const client = await Client.findById(req.params.id)
-            .populate('assignedMember', 'name username')
+            .populate('assignedMembers', 'name username')
             .populate('createdBy', 'name');
             
         if (!client) {
@@ -106,7 +106,7 @@ router.get('/:id', authMiddleware, adminMiddleware, async (req, res) => {
 // Actualizar cliente
 router.put('/:id', authMiddleware, adminMiddleware, async (req, res) => {
     try {
-        const { name, description, location, accountValue, assignedMember, clientContact } = req.body;
+        const { name, description, location, accountValue, assignedMembers, clientContact } = req.body;
 
         const client = await Client.findById(req.params.id);
         if (!client) {
@@ -118,11 +118,11 @@ router.put('/:id', authMiddleware, adminMiddleware, async (req, res) => {
         if (description !== undefined) client.description = description;
         if (location) client.location = location;
         if (accountValue !== undefined) client.accountValue = accountValue;
-        if (assignedMember) client.assignedMember = assignedMember;
+        if (assignedMembers) client.assignedMembers = assignedMembers;
         if (clientContact) client.clientContact = clientContact;
 
         await client.save();
-        await client.populate('assignedMember', 'name username');
+        await client.populate('assignedMembers', 'name username');
         await client.populate('createdBy', 'name');
         
         res.json(client);

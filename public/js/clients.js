@@ -8,10 +8,9 @@ if (!token) {
 const createClientBtn = document.getElementById('createClientBtn');
 const createClientForm = document.getElementById('createClientForm');
 const clientsList = document.getElementById('clientsList');
-const usersList = document.getElementById('usersList');
-
 // Initialize modal
 const clientModal = new Modal('createClientModal', {
+    onOpen: () => loadUsers(), // Cargar usuarios cuando se abre el modal
     onClose: () => {
         createClientForm.dataset.editingId = '';
         document.getElementById('modalTitle').textContent = 'Create Client';
@@ -20,11 +19,13 @@ const clientModal = new Modal('createClientModal', {
     }
 });
 
+
+
 // Event Listeners
 createClientBtn.addEventListener('click', () => {
     document.getElementById('modalTitle').textContent = 'Create Client';
     document.getElementById('submitBtn').textContent = 'Create';
-    loadUsers(); // Cargar usuarios para asignación
+
     clientModal.open();
 });
 
@@ -38,10 +39,11 @@ async function loadUsers() {
         });
         const users = await response.json();
         
-        usersList.innerHTML = users.map(user => `
+        const userCheckboxes = document.getElementById('userCheckboxes');
+        userCheckboxes.innerHTML = users.map(user => `
             <div class="form-check">
-                <input class="form-check-input" type="radio" name="assignedMember" 
-                       value="${user._id}" id="user_${user._id}" required>
+                <input class="form-check-input" type="checkbox" 
+                       value="${user._id}" id="user_${user._id}">
                 <label class="form-check-label" for="user_${user._id}">
                     ${user.name} (${user.username})
                 </label>
@@ -49,7 +51,7 @@ async function loadUsers() {
         `).join('');
     } catch (error) {
         console.error('Error loading users:', error);
-        usersList.innerHTML = '<div class="text-danger">Error al cargar usuarios</div>';
+        document.getElementById('userCheckboxes').innerHTML = '<div class="text-danger">Error al cargar usuarios</div>';
     }
 }
 
@@ -67,7 +69,7 @@ async function editClient(clientId) {
         await loadUsers();
 
         // Fill form with client data
-        document.getElementById('name').value = client.name;
+        document.getElementById('clientName').value = client.name;
         document.getElementById('description').value = client.description || '';
         document.getElementById('location').value = client.location;
         document.getElementById('accountValue').value = client.accountValue;
@@ -75,9 +77,11 @@ async function editClient(clientId) {
         document.getElementById('contactEmail').value = client.clientContact.email || '';
         document.getElementById('contactPhone').value = client.clientContact.phone || '';
 
-        // Select assigned member
-        const radioBtn = document.querySelector(`input[value="${client.assignedMember._id}"]`);
-        if (radioBtn) radioBtn.checked = true;
+        // Select assigned members
+        const checkboxes = document.querySelectorAll('#userCheckboxes input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = client.assignedMembers.some(member => member._id === checkbox.value);
+        });
 
         // Update modal title and button
         document.getElementById('modalTitle').textContent = 'Edit Client';
@@ -125,11 +129,11 @@ createClientForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const clientData = {
-        name: document.getElementById('name').value,
+        name: document.getElementById('clientName').value,
         description: document.getElementById('description').value,
         location: document.getElementById('location').value,
         accountValue: parseFloat(document.getElementById('accountValue').value),
-        assignedMember: document.querySelector('input[name="assignedMember"]:checked').value,
+        assignedMembers: Array.from(document.querySelectorAll('#userCheckboxes input[type="checkbox"]:checked')).map(cb => cb.value),
         clientContact: {
             name: document.getElementById('contactName').value,
             email: document.getElementById('contactEmail').value,
@@ -191,7 +195,7 @@ function displayClients(clients) {
             <td>${client.name}</td>
             <td>${client.location}</td>
             <td>$${client.accountValue.toLocaleString()}</td>
-            <td>${client.assignedMember.name}</td>
+            <td>${client.assignedMembers.map(member => member.name).join(', ')}</td>
             <td>
                 <div>${client.clientContact.name}</div>
                 <small class="text-muted">

@@ -62,10 +62,11 @@
                     <input type="number" class="form-control" id="accountValue" required>
                 </div>
                 <div class="mb-3">
-                    <label for="assignedMember" class="form-label">Assigned Member</label>
-                    <select class="form-select" id="assignedMember" required>
-                        <!-- Options will be loaded dynamically -->
-                    </select>
+                    <label class="form-label">Assigned Members</label>
+                    <div id="userCheckboxes" class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">
+                        <!-- User checkboxes will be loaded dynamically -->
+                        Loading users...
+                    </div>
                 </div>
                 <div class="mb-3">
                     <label for="clientContact" class="form-label">Client Contact</label>
