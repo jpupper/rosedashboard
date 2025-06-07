@@ -87,7 +87,7 @@ createUserForm.addEventListener('submit', async (e) => {
     const isEditing = Boolean(editingId);
 
     try {
-        const url = isEditing ? `${window.appConfig.apiUrl}/api/users/${editingId}` : `${window.appConfig.apiUrl}/api/users`;
+        const url = isEditing ? `/api/users/${editingId}` : '/api/users';
         const method = isEditing ? 'PUT' : 'POST';
 
         const response = await fetch(`${window.appConfig.apiUrl}${url}`, {
