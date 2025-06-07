@@ -8,8 +8,12 @@ const userSchema = new mongoose.Schema({
     bio: { type: String, default: '' },
     role: { type: String, default: '' },
     isAdmin: { type: Boolean, default: false },
-    createdAt: { type: Date, default: Date.now }
-});
+    createdAt: { type: Date, default: Date.now },
+    assignedProjects: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Project'
+    }]
+}, { toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 // Hash password before saving
 userSchema.pre('save', async function(next) {

@@ -46,7 +46,11 @@ const clientSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now
-    }
-});
+    },
+    projects: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Project'
+    }]
+}, { toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 module.exports = mongoose.model('Client', clientSchema);

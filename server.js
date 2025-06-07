@@ -70,14 +70,7 @@ app.get('/rose/api/export/projects', async (req, res) => {
         const Project = mongoose.model('Project');
         const projects = await Project.find()
             .populate('client')
-            .populate('assignedUsers', '-password')
-            .populate({
-                path: 'tasks',
-                populate: {
-                    path: 'assignedUsers',
-                    select: '-password'
-                }
-            });
+            .populate('assignedUsers', '-password');
 
         res.json({
             success: true,
@@ -94,13 +87,8 @@ app.get('/rose/api/export/clients', async (req, res) => {
     try {
         const Client = mongoose.model('Client');
         const clients = await Client.find()
-            .populate({
-                path: 'projects',
-                populate: [
-                    { path: 'assignedUsers', select: '-password' },
-                    { path: 'tasks' }
-                ]
-            });
+            .populate('projects')
+            .populate('assignedMembers', '-password');
 
         res.json({
             success: true,
@@ -117,13 +105,7 @@ app.get('/rose/api/export/users', async (req, res) => {
     try {
         const users = await User.find()
             .select('-password')
-            .populate({
-                path: 'assignedProjects',
-                populate: [
-                    { path: 'client' },
-                    { path: 'tasks' }
-                ]
-            });
+            .populate('assignedProjects');
 
         res.json({
             success: true,

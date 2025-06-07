@@ -35,7 +35,11 @@ const projectSchema = new mongoose.Schema({
     assignedUsers: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
+    }],
+    tasks: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Task'
     }]
-});
+}, { toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 module.exports = mongoose.model('Project', projectSchema);
