@@ -8,7 +8,7 @@ if (!token) {
 async function loadDashboardData() {
     try {
         // Load recent users
-        const usersResponse = await fetch('/api/users', {
+        const usersResponse = await fetch(`${window.appConfig.apiUrl}/api/users`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -22,7 +22,7 @@ async function loadDashboardData() {
         displayRecentUsers(users.slice(0, 5)); // Show last 5 users
 
         // Load recent projects
-        const projectsResponse = await fetch('/api/projects', {
+        const projectsResponse = await fetch(`${window.appConfig.apiUrl}/api/projects`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }

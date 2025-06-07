@@ -20,7 +20,7 @@ document.querySelectorAll('.user-only').forEach(el => {
 // Load user profile
 async function loadProfile() {
     try {
-        const response = await fetch('/api/users/me', {
+        const response = await fetch(`${window.appConfig.apiUrl}/api/users/me`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -77,7 +77,7 @@ profileForm.addEventListener('submit', async (e) => {
     }
 
     try {
-        const response = await fetch('/api/users/me', {
+        const response = await fetch(`${window.appConfig.apiUrl}/api/users/me`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',

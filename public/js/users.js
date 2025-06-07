@@ -28,7 +28,7 @@ createUserBtn.addEventListener('click', () => {
 // Edit user function
 async function editUser(userId) {
     try {
-        const response = await fetch(`/api/users/${userId}`, {
+        const response = await fetch(`${window.appConfig.apiUrl}/api/users/${userId}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -90,8 +90,8 @@ createUserForm.addEventListener('submit', async (e) => {
         const url = isEditing ? `/api/users/${editingId}` : '/api/users';
         const method = isEditing ? 'PUT' : 'POST';
 
-        const response = await fetch(url, {
-            method: 'POST',
+        const response = await fetch(`${window.appConfig.apiUrl}${url}`, {
+            method,
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
@@ -116,7 +116,7 @@ createUserForm.addEventListener('submit', async (e) => {
 // Load users
 async function loadUsers() {
     try {
-        const response = await fetch('/api/users', {
+        const response = await fetch(`${window.appConfig.apiUrl}/api/users`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }

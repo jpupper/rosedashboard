@@ -25,7 +25,7 @@ createProjectBtn.addEventListener('click', () => projectModal.open());
 // Load users for project assignment
 async function loadUsersForAssignment() {
     try {
-        const response = await fetch('/api/users', {
+        const response = await fetch(`${window.appConfig.apiUrl}/api/users`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -60,7 +60,7 @@ createProjectForm.addEventListener('submit', async (e) => {
     const isEditing = Boolean(editingId);
 
     try {
-        const url = isEditing ? `/api/projects/${editingId}` : '/api/projects';
+        const url = isEditing ? `${window.appConfig.apiUrl}/api/projects/${editingId}` : `${window.appConfig.apiUrl}/api/projects`;
         const method = isEditing ? 'PUT' : 'POST';
 
         const response = await fetch(url, {
@@ -93,7 +93,7 @@ createProjectForm.addEventListener('submit', async (e) => {
 // Load projects
 async function loadProjects() {
     try {
-        const response = await fetch('/api/projects', {
+        const response = await fetch(`${window.appConfig.apiUrl}/api/projects`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -128,7 +128,7 @@ function displayProjects(projects) {
 // Cargar usuarios para asignación
 async function loadUsersForAssignment() {
     try {
-        const response = await fetch('/api/users', {
+        const response = await fetch(`${window.appConfig.apiUrl}/api/users`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -171,7 +171,7 @@ loadProjects();
 // Editar proyecto
 async function editProject(projectId) {
     try {
-        const response = await fetch(`/api/projects/${projectId}`, {
+        const response = await fetch(`${window.appConfig.apiUrl}/api/projects/${projectId}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
