@@ -73,7 +73,7 @@ router.get('/me', authMiddleware, async (req, res) => {
 // Update current user profile
 router.put('/me', authMiddleware, async (req, res) => {
     try {
-        const { name, username, password, role, bio } = req.body;
+        const { name, username, password, role, bio, socialMedia } = req.body;
         const userId = req.user.id;
 
         // Check if username is taken by another user
@@ -93,6 +93,7 @@ router.put('/me', authMiddleware, async (req, res) => {
         if (username) updateData.username = username;
         if (bio !== undefined) updateData.bio = bio;
         if (role !== undefined) updateData.role = role;
+        if (socialMedia !== undefined) updateData.socialMedia = socialMedia;
 
         // Handle password update
         if (password) {
@@ -139,7 +140,7 @@ router.get('/', authMiddleware, adminMiddleware, async (req, res) => {
 // Crear nuevo usuario (solo admin)
 router.post('/', authMiddleware, adminMiddleware, async (req, res) => {
     try {
-        const { username, password, name, bio, isAdmin } = req.body;
+        const { username, password, name, bio, isAdmin, socialMedia } = req.body;
 
         // Verificar si el usuario ya existe
         const existingUser = await User.findOne({ username });
@@ -153,7 +154,8 @@ router.post('/', authMiddleware, adminMiddleware, async (req, res) => {
             password,
             name,
             bio,
-            isAdmin: isAdmin || false
+            isAdmin: isAdmin || false,
+            socialMedia: socialMedia || {}
         });
 
         await user.save();
@@ -185,7 +187,7 @@ router.get('/:id', authMiddleware, async (req, res) => {
 // Actualizar usuario
 router.put('/:id', authMiddleware, adminMiddleware, async (req, res) => {
     try {
-        const { username, name, bio, isAdmin } = req.body;
+        const { username, name, bio, isAdmin, socialMedia } = req.body;
         const user = await User.findById(req.params.id);
 
         if (!user) {
@@ -197,6 +199,7 @@ router.put('/:id', authMiddleware, adminMiddleware, async (req, res) => {
         if (name) user.name = name;
         if (bio !== undefined) user.bio = bio;
         if (isAdmin !== undefined) user.isAdmin = isAdmin;
+        if (socialMedia !== undefined) user.socialMedia = socialMedia;
 
         await user.save();
         

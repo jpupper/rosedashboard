@@ -12,7 +12,14 @@ const userSchema = new mongoose.Schema({
     assignedProjects: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Project'
-    }]
+    }],
+    socialMedia: {
+        whatsapp: { type: String, default: '' },
+        telegram: { type: String, default: '' },
+        email: { type: String, default: '' },
+        slackUser: { type: String, default: '' },
+        instagram: { type: String, default: '' }
+    }
 }, { toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 // Hash password before saving

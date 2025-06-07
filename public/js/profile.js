@@ -49,6 +49,15 @@ async function loadProfile() {
         document.getElementById('role').value = data.user.role || 'other';
         document.getElementById('bio').value = data.user.bio || '';
         document.getElementById('access').value = data.user.isAdmin ? 'Administrator' : 'User';
+
+        // Fill social media fields
+        if (data.user.socialMedia) {
+            document.getElementById('whatsapp').value = data.user.socialMedia.whatsapp || '';
+            document.getElementById('telegram').value = data.user.socialMedia.telegram || '';
+            document.getElementById('email').value = data.user.socialMedia.email || '';
+            document.getElementById('slackUser').value = data.user.socialMedia.slackUser || '';
+            document.getElementById('instagram').value = data.user.socialMedia.instagram || '';
+        }
         
         // Clear password fields
         document.getElementById('newPassword').value = '';
@@ -75,7 +84,14 @@ profileForm.addEventListener('submit', async (e) => {
         name: document.getElementById('name').value,
         username: document.getElementById('username').value,
         role: document.getElementById('role').value,
-        bio: document.getElementById('bio').value
+        bio: document.getElementById('bio').value,
+        socialMedia: {
+            whatsapp: document.getElementById('whatsapp').value,
+            telegram: document.getElementById('telegram').value,
+            email: document.getElementById('email').value,
+            slackUser: document.getElementById('slackUser').value,
+            instagram: document.getElementById('instagram').value
+        }
     };
 
     // Only include password if it's being changed

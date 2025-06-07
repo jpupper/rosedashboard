@@ -46,6 +46,15 @@ async function editUser(userId) {
         document.getElementById('role').value = user.role || 'other';
         document.getElementById('access').value = user.isAdmin ? 'admin' : 'user';
 
+        // Fill social media fields
+        if (user.socialMedia) {
+            document.getElementById('whatsapp').value = user.socialMedia.whatsapp || '';
+            document.getElementById('telegram').value = user.socialMedia.telegram || '';
+            document.getElementById('email').value = user.socialMedia.email || '';
+            document.getElementById('slackUser').value = user.socialMedia.slackUser || '';
+            document.getElementById('instagram').value = user.socialMedia.instagram || '';
+        }
+
         // Hide password field for editing
         document.getElementById('password').required = false;
         document.getElementById('password').value = '';
@@ -73,7 +82,14 @@ createUserForm.addEventListener('submit', async (e) => {
         username: document.getElementById('username').value,
         bio: document.getElementById('bio').value,
         role: document.getElementById('role').value,
-        isAdmin: document.getElementById('access').value === 'admin'
+        isAdmin: document.getElementById('access').value === 'admin',
+        socialMedia: {
+            whatsapp: document.getElementById('whatsapp').value,
+            telegram: document.getElementById('telegram').value,
+            email: document.getElementById('email').value,
+            slackUser: document.getElementById('slackUser').value,
+            instagram: document.getElementById('instagram').value
+        }
     };
 
     // Only include password for new users
@@ -139,6 +155,16 @@ function displayUsers(users) {
             </td>
             <td>
                 <small class="text-muted">${user.bio || '-'}</small>
+            </td>
+            <td>
+                <div class="social-links">
+                    ${user.socialMedia?.whatsapp ? `<div><strong>WhatsApp:</strong> ${user.socialMedia.whatsapp}</div>` : ''}
+                    ${user.socialMedia?.telegram ? `<div><strong>Telegram:</strong> ${user.socialMedia.telegram}</div>` : ''}
+                    ${user.socialMedia?.email ? `<div><strong>Email:</strong> ${user.socialMedia.email}</div>` : ''}
+                    ${user.socialMedia?.slackUser ? `<div><strong>Slack:</strong> ${user.socialMedia.slackUser}</div>` : ''}
+                    ${user.socialMedia?.instagram ? `<div><strong>Instagram:</strong> ${user.socialMedia.instagram}</div>` : ''}
+                    ${!user.socialMedia || Object.values(user.socialMedia).every(v => !v) ? '-' : ''}
+                </div>
             </td>
             <td>
                 <small class="text-muted">${new Date(user.createdAt).toLocaleDateString()}</small>

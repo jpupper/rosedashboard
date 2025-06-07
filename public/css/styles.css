@@ -65,6 +65,20 @@ body {
     background-color: #f8f9fa;
 }
 
+/* Social media links styles */
+.social-links {
+    font-size: 0.85em;
+}
+
+.social-links div {
+    margin-bottom: 3px;
+}
+
+.social-links strong {
+    color: #666;
+    margin-right: 5px;
+}
+
 /* Form styles */
 .form-control {
     border-radius: 5px;
