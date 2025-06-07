@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Details - Rose Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/styles.css" rel="stylesheet">
+    <link href="../css/branding.css" rel="stylesheet">
+    <style>
+        .task-item {
+            border-left: 4px solid transparent;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background-color: #f8f9fa;
+        }
+        .task-item.assigned {
+            border-left-color: #0d6efd;
+        }
+        .task-item.completed {
+            background-color: #e9ecef;
+        }
+        .task-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .task-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Menu will be injected here by admin-menu.js -->
+
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 id="projectName">Project Details</h2>
+            <div id="adminControls" style="display: none;">
+                <button class="btn btn-primary" id="createTaskBtn">Create Task</button>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Project Information</h5>
+                        <p id="projectDescription" class="card-text"></p>
+                        <div id="projectDetails">
+                            <p><strong>Client:</strong> <span id="projectClient"></span></p>
+                            <p><strong>State:</strong> <span id="projectState"></span></p>
+                            <p><strong>Categories:</strong> <span id="projectCategories"></span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Assigned Users</h5>
+                        <div id="assignedUsers"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Tasks</h5>
+                        <div id="tasksList"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para crear tarea -->
+    <div class="modal" id="createTaskModal">
+        <div class="modal-content">
+            <button type="button" class="close" aria-label="Close">&times;</button>
+            <h2>Create New Task</h2>
+            <form id="createTaskForm">
+                <div class="mb-3">
+                    <label for="taskTitle" class="form-label">Task Title</label>
+                    <input type="text" class="form-control" id="taskTitle" required>
+                </div>
+                <div class="mb-3">
+                    <label for="taskDescription" class="form-label">Description</label>
+                    <textarea class="form-control" id="taskDescription" rows="3" required></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Assigned Users</label>
+                    <div id="taskUserCheckboxes" class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">
+                        <!-- User checkboxes will be loaded dynamically -->
+                        Loading users...
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Create Task</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/Modal.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/admin-menu.js"></script>
+    <script src="../js/project-details.js"></script>
+</body>
+</html>

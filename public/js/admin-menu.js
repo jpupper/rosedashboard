@@ -45,13 +45,19 @@ function createAdminMenu() {
     // Add logout handler
     document.getElementById('logoutBtn').addEventListener('click', () => {
         localStorage.removeItem('token');
-        localStorage.removeItem('isAdmin');
-        localStorage.removeItem('userId');
+        localStorage.removeItem('user');
         window.location.href = window.appConfig.frontendUrl + '/';
     });
 }
 
 // Only create admin menu if user is admin
-if (localStorage.getItem('isAdmin') === 'true') {
-    createAdminMenu();
+let user;
+try {
+    user = JSON.parse(localStorage.getItem('user'));
+    if (user && user.isAdmin) {
+        createAdminMenu();
+    }
+} catch (error) {
+    console.error('Error loading user:', error);
+    window.location.href = window.appConfig.frontendUrl + '/';
 }

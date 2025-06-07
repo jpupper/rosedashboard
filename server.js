@@ -10,6 +10,7 @@ const config = require('./config');
 // Import models
 const User = require('./models/User');
 require('./models/Project');
+require('./models/Task');
 
 const PORT = process.env.PORT || 3343;
 
@@ -18,6 +19,7 @@ const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const projectRoutes = require('./routes/projects');
 const clientRoutes = require('./routes/clients');
+const taskRoutes = require('./routes/tasks');
 // Función para inicializar la base de datos
 async function initializeDatabase() {
     try {
@@ -67,6 +69,7 @@ app.use('/rose/api/auth', authRoutes);
 app.use('/rose/api/users', userRoutes);
 app.use('/rose/api/projects', projectRoutes);
 app.use('/rose/api/clients', clientRoutes);
+app.use('/rose/api/tasks', taskRoutes);
 
 // Ruta principal para /rose
 app.get('/rose', (req, res) => {

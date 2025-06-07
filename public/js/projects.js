@@ -143,7 +143,11 @@ async function loadProjects() {
 function displayProjects(projects) {
     projectsList.innerHTML = projects.map(project => `
         <tr>
-            <td>${project.name}</td>
+            <td>
+                <a href="project-details.html?id=${project._id}" class="text-decoration-none">
+                    ${project.name}
+                </a>
+            </td>
             <td>${project.description}</td>
             <td>${project.client ? project.client.name : 'No client'}</td>
             <td>${project.categories?.join(', ') || 'No categories'}</td>

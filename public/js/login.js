@@ -18,8 +18,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
         if (response.ok) {
             // Store user data
             localStorage.setItem('token', data.token);
-            localStorage.setItem('isAdmin', data.user.isAdmin);
-            localStorage.setItem('userId', data.user._id || data.user.id);
+            localStorage.setItem('user', JSON.stringify(data.user));
             
             // Redirect based on user type
             if (data.user.isAdmin) {
