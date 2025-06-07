@@ -11,7 +11,10 @@ const projectsList = document.getElementById('projectsList');
 
 // Initialize modal
 const projectModal = new Modal('createProjectModal', {
-    onOpen: () => loadUsersForAssignment(),
+    onOpen: () => {
+        loadUsersForAssignment();
+        loadClientsForAssignment();
+    },
     onClose: () => {
         if (createProjectForm.dataset.editingId) {
             createProjectForm.dataset.editingId = '';
@@ -21,6 +24,35 @@ const projectModal = new Modal('createProjectModal', {
 
 // Event Listeners
 createProjectBtn.addEventListener('click', () => projectModal.open());
+
+// Load clients for project assignment
+async function loadClientsForAssignment() {
+    try {
+        const response = await fetch(`${window.appConfig.apiUrl}/api/clients`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        const clients = await response.json();
+        const clientSelect = document.getElementById('projectClient');
+        
+        // Mantener la opción por defecto
+        const defaultOption = clientSelect.options[0];
+        clientSelect.innerHTML = '';
+        clientSelect.appendChild(defaultOption);
+        
+        // Agregar las opciones de clientes
+        clients.forEach(client => {
+            const option = document.createElement('option');
+            option.value = client._id;
+            option.textContent = client.name;
+            clientSelect.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error loading clients:', error);
+        document.getElementById('projectClient').innerHTML = '<option>Error loading clients</option>';
+    }
+}
 
 // Load users for project assignment
 async function loadUsersForAssignment() {
@@ -53,6 +85,9 @@ createProjectForm.addEventListener('submit', async (e) => {
     const projectData = {
         name: document.getElementById('projectName').value,
         description: document.getElementById('projectDescription').value,
+        client: document.getElementById('projectClient').value || undefined,
+        categories: document.getElementById('projectCategories').value.split(',').map(cat => cat.trim()).filter(cat => cat),
+        state: document.getElementById('projectState').value,
         assignedUsers: getSelectedUsers()
     };
 
@@ -110,6 +145,9 @@ function displayProjects(projects) {
         <tr>
             <td>${project.name}</td>
             <td>${project.description}</td>
+            <td>${project.client ? project.client.name : 'No client'}</td>
+            <td>${project.categories?.join(', ') || 'No categories'}</td>
+            <td>${project.state}</td>
             <td>${project.createdBy?.name || 'Admin'}</td>
             <td>${new Date(project.createdAt).toLocaleDateString()}</td>
             <td>
@@ -181,6 +219,9 @@ async function editProject(projectId) {
         // Llenar el formulario
         document.getElementById('projectName').value = project.name;
         document.getElementById('projectDescription').value = project.description;
+        document.getElementById('projectClient').value = project.client?._id || '';
+        document.getElementById('projectCategories').value = project.categories?.join(', ') || '';
+        document.getElementById('projectState').value = project.state;
 
         // Cargar usuarios y marcar los asignados
         await loadUsersForAssignment();
@@ -223,7 +264,8 @@ async function deleteProject(projectId) {
     }
 }
 
-// If we're in the create/edit form, load users
+// If we're in the create/edit form, load initial data
 if (document.getElementById('userCheckboxes')) {
     loadUsersForAssignment();
+    loadClientsForAssignment();
 }

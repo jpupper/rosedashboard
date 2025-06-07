@@ -9,6 +9,20 @@ const projectSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    client: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Client',
+        required: false
+    },
+    categories: [{
+        type: String,
+        trim: true
+    }],
+    state: {
+        type: String,
+        enum: ['kickoff', 'milestones', 'deadline'],
+        default: 'kickoff'
+    },
     createdBy: {
         type: mongoose.Schema.Types.Mixed,
         ref: 'User',

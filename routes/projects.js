@@ -34,7 +34,7 @@ router.get('/', authMiddleware, async (req, res) => {
         let projects;
         if (req.user.isAdmin) {
             projects = await Project.find()
-                .populate('assignedUsers', 'name username');
+                .populate(['assignedUsers', 'client']);
         } else {
             projects = await Project.find({
                 $or: [
@@ -43,7 +43,7 @@ router.get('/', authMiddleware, async (req, res) => {
                 ]
             })
             .populate('createdBy', 'name')
-            .populate('assignedUsers', 'name username');
+            .populate(['assignedUsers', 'client']);
         }
 
         // Formatear la respuesta para manejar proyectos creados por admin
@@ -87,11 +87,14 @@ router.get('/assigned', authMiddleware, async (req, res) => {
 // Crear nuevo proyecto
 router.post('/', authMiddleware, async (req, res) => {
     try {
-        const { name, description, assignedUsers } = req.body;
+        const { name, description, client, categories, state, assignedUsers } = req.body;
 
         const project = new Project({
             name,
             description,
+            client: client || undefined,
+            categories: categories || [],
+            state: state || 'kickoff',
             createdBy: req.user.isAdmin ? 'admin' : req.user.id,
             assignedUsers: assignedUsers || []
         });
@@ -116,7 +119,7 @@ router.post('/', authMiddleware, async (req, res) => {
 router.get('/:id', authMiddleware, async (req, res) => {
     try {
         const project = await Project.findById(req.params.id)
-            .populate('assignedUsers', 'name username');
+            .populate(['assignedUsers', 'client']);
 
         if (!project) {
             return res.status(404).json({ message: 'Proyecto no encontrado' });
@@ -154,9 +157,12 @@ router.put('/:id', authMiddleware, async (req, res) => {
             return res.status(403).json({ message: 'Acceso denegado' });
         }
 
-        const { name, description, assignedUsers } = req.body;
+        const { name, description, client, categories, state, assignedUsers } = req.body;
         if (name) project.name = name;
         if (description) project.description = description;
+        if (client !== undefined) project.client = client || undefined;
+        if (categories) project.categories = categories;
+        if (state) project.state = state;
         if (assignedUsers) project.assignedUsers = assignedUsers;
 
         await project.save();

@@ -24,6 +24,9 @@
                         <tr>
                             <th>Name</th>
                             <th>Description</th>
+                            <th>Client</th>
+                            <th>Categories</th>
+                            <th>State</th>
                             <th>Created by</th>
                             <th>Date</th>
                             <th>Assigned Users</th>
@@ -50,6 +53,26 @@
                 <div class="mb-3">
                     <label for="projectDescription" class="form-label">Description</label>
                     <textarea class="form-control" id="projectDescription" rows="3" required></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="projectClient" class="form-label">Client</label>
+                    <select class="form-select" id="projectClient">
+                        <option value="">Select a client (optional)</option>
+                        <!-- Client options will be loaded dynamically -->
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="projectCategories" class="form-label">Categories</label>
+                    <input type="text" class="form-control" id="projectCategories" placeholder="Enter categories separated by commas">
+                    <small class="text-muted">Example: frontend, api, design</small>
+                </div>
+                <div class="mb-3">
+                    <label for="projectState" class="form-label">State</label>
+                    <select class="form-select" id="projectState" required>
+                        <option value="kickoff">Kickoff</option>
+                        <option value="milestones">Milestones</option>
+                        <option value="deadline">Deadline</option>
+                    </select>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Assigned Users</label>
