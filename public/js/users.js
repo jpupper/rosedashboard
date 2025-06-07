@@ -1,7 +1,7 @@
 // Check authentication
 const token = localStorage.getItem('token');
 if (!token) {
-    window.location.href = getPath('/');
+    window.location.href = window.appConfig.getPath('/');
 }
 
 // DOM Elements

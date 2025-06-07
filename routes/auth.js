@@ -16,8 +16,12 @@ router.post('/login', async (req, res) => {
             let adminUser = await User.findOne({ username: config.ADMIN_CREDENTIALS.username });
             
             if (!adminUser) {
+                const bcrypt = require('bcryptjs');
+                const hashedPassword = await bcrypt.hash(config.ADMIN_CREDENTIALS.password, 10);
+                
                 adminUser = new User({
                     username: config.ADMIN_CREDENTIALS.username,
+                    password: hashedPassword,
                     name: 'Administrator',
                     isAdmin: true
                 });

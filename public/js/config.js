@@ -1,24 +1,18 @@
-const config = {
-    development: {
-        apiUrl: 'http://localhost:3343/rose',
-        basePath: '/rose'
+const CONFIG = {
+    isLocal: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1',
+    get apiUrl() {
+        return this.isLocal ? 'http://localhost:3343/rose' : 'https://vps-4455523-x.dattaweb.com/rose';
     },
-    production: {
-        apiUrl: 'https://vps-4455523-x.dattaweb.com/rose',
-        basePath: '/rose'
+    get frontendUrl() {
+        return this.isLocal ? 'http://localhost:3343/rose' : 'https://jeyder.com.ar/rose';
+    },
+    get basePath() {
+        return '/rose';
+    },
+    getPath(path) {
+        return `${this.basePath}${path}`;
     }
 };
 
-// Función para obtener la ruta completa
-function getPath(path) {
-    return `${currentConfig.basePath}${path}`;
-}
-
-// Cambiar esto según el entorno (development o production)
-const environment = 'development';
-
-// Exportar la configuración del entorno actual
-const currentConfig = config[environment];
-
-// Para usar en otros archivos
-window.appConfig = currentConfig;
+// Para mantener compatibilidad con el código existente
+window.appConfig = CONFIG;
