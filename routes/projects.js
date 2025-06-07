@@ -202,4 +202,30 @@ router.delete('/:id', authMiddleware, async (req, res) => {
     }
 });
 
+// Export all projects with tasks
+router.get('/export', async (req, res) => {
+    try {
+
+        const projects = await Project.find()
+            .populate('client')
+            .populate('assignedUsers', '-password')
+            .populate({
+                path: 'tasks',
+                populate: {
+                    path: 'assignedUsers',
+                    select: '-password'
+                }
+            });
+
+        res.json({
+            success: true,
+            timestamp: new Date(),
+            projects: projects
+        });
+    } catch (error) {
+        console.error('Error exporting projects:', error);
+        res.status(500).json({ success: false, message: 'Error exporting projects' });
+    }
+});
+
 module.exports = router;

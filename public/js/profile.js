@@ -1,20 +1,27 @@
 // Check authentication
 const token = localStorage.getItem('token');
-if (!token) {
+let currentUser;
+
+try {
+    currentUser = JSON.parse(localStorage.getItem('user'));
+} catch (error) {
+    console.error('Error parsing user:', error);
+}
+
+// Redirect if not authenticated
+if (!token || !currentUser) {
     window.location.href = window.appConfig.frontendUrl + '/';
 }
 
 // Get DOM elements
 const profileForm = document.getElementById('profileForm');
-const logoutBtn = document.getElementById('logoutBtn');
 
 // Show/hide menu items based on user access
-const isAdmin = localStorage.getItem('isAdmin') === 'true';
 document.querySelectorAll('.admin-only').forEach(el => {
-    el.style.display = isAdmin ? 'block' : 'none';
+    el.style.display = currentUser.isAdmin ? 'block' : 'none';
 });
 document.querySelectorAll('.user-only').forEach(el => {
-    el.style.display = !isAdmin ? 'block' : 'none';
+    el.style.display = !currentUser.isAdmin ? 'block' : 'none';
 });
 
 // Load user profile
@@ -103,13 +110,7 @@ profileForm.addEventListener('submit', async (e) => {
     }
 });
 
-// Logout handler
-logoutBtn.addEventListener('click', () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('isAdmin');
-    localStorage.removeItem('userId');
-    window.location.href = window.appConfig.frontendUrl + '/';
-});
+
 
 // Load initial data
 loadProfile();

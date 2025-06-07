@@ -146,4 +146,28 @@ router.delete('/:id', authMiddleware, adminMiddleware, async (req, res) => {
     }
 });
 
+// Export all clients
+router.get('/export', async (req, res) => {
+    try {
+
+        const clients = await Client.find()
+            .populate({
+                path: 'projects',
+                populate: [
+                    { path: 'assignedUsers', select: '-password' },
+                    { path: 'tasks' }
+                ]
+            });
+
+        res.json({
+            success: true,
+            timestamp: new Date(),
+            clients: clients
+        });
+    } catch (error) {
+        console.error('Error exporting clients:', error);
+        res.status(500).json({ success: false, message: 'Error exporting clients' });
+    }
+});
+
 module.exports = router;

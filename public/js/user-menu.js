@@ -36,13 +36,19 @@ function createUserMenu() {
     // Add logout handler
     document.getElementById('logoutBtn').addEventListener('click', () => {
         localStorage.removeItem('token');
-        localStorage.removeItem('isAdmin');
-        localStorage.removeItem('userId');
+        localStorage.removeItem('user');
         window.location.href = window.appConfig.frontendUrl + '/';
     });
 }
 
 // Create menu if user is not admin
-if (localStorage.getItem('isAdmin') !== 'true') {
-    createUserMenu();
+let user;
+try {
+    user = JSON.parse(localStorage.getItem('user'));
+    if (user && !user.isAdmin) {
+        createUserMenu();
+    }
+} catch (error) {
+    console.error('Error loading user:', error);
+    window.location.href = window.appConfig.frontendUrl + '/';
 }

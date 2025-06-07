@@ -64,6 +64,78 @@ app.use(cookieParser());
 // Servir archivos estáticos con prefijo /rose
 app.use('/rose', express.static(path.join(__dirname, 'public')));
 
+// Rutas de exportación sin autenticación
+app.get('/rose/api/export/projects', async (req, res) => {
+    try {
+        const Project = mongoose.model('Project');
+        const projects = await Project.find()
+            .populate('client')
+            .populate('assignedUsers', '-password')
+            .populate({
+                path: 'tasks',
+                populate: {
+                    path: 'assignedUsers',
+                    select: '-password'
+                }
+            });
+
+        res.json({
+            success: true,
+            timestamp: new Date(),
+            projects: projects
+        });
+    } catch (error) {
+        console.error('Error exporting projects:', error);
+        res.status(500).json({ success: false, message: 'Error exporting projects' });
+    }
+});
+
+app.get('/rose/api/export/clients', async (req, res) => {
+    try {
+        const Client = mongoose.model('Client');
+        const clients = await Client.find()
+            .populate({
+                path: 'projects',
+                populate: [
+                    { path: 'assignedUsers', select: '-password' },
+                    { path: 'tasks' }
+                ]
+            });
+
+        res.json({
+            success: true,
+            timestamp: new Date(),
+            clients: clients
+        });
+    } catch (error) {
+        console.error('Error exporting clients:', error);
+        res.status(500).json({ success: false, message: 'Error exporting clients' });
+    }
+});
+
+app.get('/rose/api/export/users', async (req, res) => {
+    try {
+        const users = await User.find()
+            .select('-password')
+            .populate({
+                path: 'assignedProjects',
+                populate: [
+                    { path: 'client' },
+                    { path: 'tasks' }
+                ]
+            });
+
+        res.json({
+            success: true,
+            timestamp: new Date(),
+            users: users
+        });
+    } catch (error) {
+        console.error('Error exporting users:', error);
+        res.status(500).json({ success: false, message: 'Error exporting users' });
+    }
+});
+
 // Use routes con prefijo /rose
 app.use('/rose/api/auth', authRoutes);
 app.use('/rose/api/users', userRoutes);

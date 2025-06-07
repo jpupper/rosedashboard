@@ -1,20 +1,17 @@
 // Check authentication
 const token = localStorage.getItem('token');
-const userId = localStorage.getItem('userId');
-const isAdmin = localStorage.getItem('isAdmin') === 'true';
+let currentUser;
 
-// Redirect if not authenticated or if admin
-if (!token || !userId || isAdmin) {
-    window.location.href = getPath('/');
+try {
+    currentUser = JSON.parse(localStorage.getItem('user'));
+} catch (error) {
+    console.error('Error parsing user:', error);
 }
 
-// Logout function
-document.getElementById('logoutBtn').addEventListener('click', () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('isAdmin');
-    localStorage.removeItem('userId');
-    window.location.href = getPath('/');
-});
+// Redirect if not authenticated or if admin
+if (!token || !currentUser || currentUser.isAdmin) {
+    window.location.href = window.appConfig.getPath('/');
+}
 
 // Load user's projects
 async function loadUserProjects() {
@@ -64,7 +61,11 @@ function displayProjects(projects) {
         <div class="dashboard-item">
             <div class="d-flex flex-column">
                 <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h6 class="mb-0">${project.name}</h6>
+                    <h6 class="mb-0">
+                        <a href="${window.appConfig.frontendUrl}/user/project-details.html?id=${project._id}" class="text-decoration-none">
+                            ${project.name}
+                        </a>
+                    </h6>
                     <small class="text-muted">${new Date(project.createdAt).toLocaleDateString()}</small>
                 </div>
                 <div class="dashboard-fields">
@@ -73,12 +74,17 @@ function displayProjects(projects) {
                         <span class="field-value">${project.description || 'No description'}</span>
                     </div>
                     <div class="field-row">
-                        <span class="field-label">Created by:</span>
-                        <span class="field-value">${project.createdBy?.name || 'Admin'}</span>
+                        <span class="field-label">State:</span>
+                        <span class="field-value">${project.state}</span>
                     </div>
                     <div class="field-row">
                         <span class="field-label">Team:</span>
                         <span class="field-value">${project.assignedUsers?.map(user => user.name).join(', ') || 'No team members'}</span>
+                    </div>
+                    <div class="mt-2">
+                        <a href="${window.appConfig.frontendUrl}/user/project-details.html?id=${project._id}" class="btn btn-sm btn-primary">
+                            View Details & Tasks
+                        </a>
                     </div>
                 </div>
             </div>
