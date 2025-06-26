@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutorial - Rose Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/styles.css" rel="stylesheet">
+    <link href="css/branding.css" rel="stylesheet">
+    <style>
+        /* Font styling */
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Optician', sans-serif;
+        }
+        
+        body, p, li, ul, ol, div {
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            line-height: 1.6;
+        }
+        
+        /* Section styling */
+        .tutorial-section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+        
+        .agent-box {
+            border: 1px solid var(--border-color);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .agent-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            font-family: 'Optician', sans-serif;
+        }
+        
+        .workflow-diagram {
+            max-width: 100%;
+            margin: 1.5rem 0;
+        }
+        
+        .key-feature {
+            background-color: rgba(0,0,0,0.05);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        code {
+            background-color: #f8f9fa;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.2rem;
+            font-family: monospace;
+        }
+        
+        /* Custom navigation for tutorial page */
+        .tutorial-nav {
+            background-color: var(--primary-color);
+            padding: 1rem 0;
+        }
+        
+        .tutorial-nav .navbar-brand {
+            color: var(--secondary-color);
+            font-family: 'Optician', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <!-- Custom navigation for tutorial page -->
+    <nav class="navbar navbar-expand-lg navbar-dark tutorial-nav">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="index.html">Rose Dashboard</a>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h2 class="card-title">Rose n8n Agent System Tutorial</h2>
+                        
+                        <div class="tutorial-section">
+                            <h3>System Overview</h3>
+                            <p>The Rose n8n Agent System is an intelligent workflow automation platform that uses a network of specialized AI agents to handle various tasks across different services. The system is designed with a central orchestrator agent that routes requests to specialized subagents based on the task requirements.</p>
+                            
+                            <div class="key-feature">
+                                <h4>Key Features</h4>
+                                <ul>
+                                    <li>Multi-agent architecture with specialized agents for different services</li>
+                                    <li>Intelligent task routing and sequencing</li>
+                                    <li>Bidirectional communication between agents</li>
+                                    <li>Natural language processing of user requests</li>
+                                    <li>Integration with Slack, Asana, Gmail, and Google Calendar</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="tutorial-section">
+                            <h3>Agent Architecture</h3>
+                            <p>The system uses a hub-and-spoke architecture with the Orchestrator Agent at the center:</p>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="agent-box">
+                                        <div class="agent-title">Master Orchestrator Agent</div>
+                                        <p>Central coordinator that processes all incoming user requests and routes them to the appropriate specialized agent. It can sequence multi-step operations and manage the flow of information between agents.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="agent-box">
+                                        <div class="agent-title">Mail Agent</div>
+                                        <p>Handles email interactions including retrieving, filtering, and summarizing emails. Also converts emails into structured commands for Asana project/task creation.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="agent-box">
+                                        <div class="agent-title">Slack Agent</div>
+                                        <p>Manages all Slack operations including channel creation, user management, message retrieval and sending, conversation summarization, and channel archiving.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="agent-box">
+                                        <div class="agent-title">Asana Agent</div>
+                                        <p>Handles all Asana project and task management including creation, modification, listing, and deletion of projects and tasks.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="agent-box">
+                                        <div class="agent-title">Calendar Agent</div>
+                                        <p>Manages Google Calendar operations including creating, updating, searching, and retrieving events and meetings.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="tutorial-section">
+                            <h3>How the System Works</h3>
+                            
+                            <h4>Request Flow</h4>
+                            <ol>
+                                <li><strong>Input Reception:</strong> System receives user input from Slack, Gmail, or Telegram</li>
+                                <li><strong>Intent Recognition:</strong> Orchestrator analyzes the request to identify necessary agent(s)</li>
+                                <li><strong>Task Routing:</strong> Request is sent to the appropriate specialized agent</li>
+                                <li><strong>Task Execution:</strong> Specialized agent performs the required action</li>
+                                <li><strong>Response Generation:</strong> Results are formatted and returned to the user</li>
+                            </ol>
+                            
+                            <h4>Multi-Step Operations</h4>
+                            <p>For complex requests requiring multiple agents, the Orchestrator sequences operations logically:</p>
+                            <ol>
+                                <li>Analyze request to identify all necessary subtasks</li>
+                                <li>Determine optimal sequence of operations</li>
+                                <li>Execute each step sequentially, passing outputs from one agent as inputs to the next</li>
+                                <li>Combine results into a coherent response</li>
+                            </ol>
+                        </div>
+                        
+                        <div class="tutorial-section">
+                            <h3>Example Scenarios</h3>
+                            
+                            <div class="key-feature">
+                                <h4>Scenario 1: Email to Asana Project Conversion</h4>
+                                <p><strong>User Input:</strong> An email is received via Gmail trigger</p>
+                                <p><strong>Process:</strong></p>
+                                <ol>
+                                    <li>Orchestrator identifies email source and routes to Mail Agent</li>
+                                    <li>Mail Agent converts email content into Asana command</li>
+                                    <li>Orchestrator takes Mail Agent output and routes to Asana Agent</li>
+                                    <li>Asana Agent creates project/tasks based on email content</li>
+                                    <li>User receives confirmation of created project/tasks</li>
+                                </ol>
+                            </div>
+                            
+                            <div class="key-feature">
+                                <h4>Scenario 2: Slack Conversation to Asana Tasks</h4>
+                                <p><strong>User Input:</strong> "Get messages from #project-planning, summarize them and create an Asana project with tasks"</p>
+                                <p><strong>Process:</strong></p>
+                                <ol>
+                                    <li>Orchestrator recognizes multi-step request involving Slack and Asana</li>
+                                    <li>Slack Agent retrieves and summarizes channel messages</li>
+                                    <li>Orchestrator passes summary to Asana Agent</li>
+                                    <li>Asana Agent creates project with tasks based on summary</li>
+                                    <li>User receives confirmation with project details</li>
+                                </ol>
+                            </div>
+                        </div>
+                        
+                        <div class="tutorial-section">
+                            <h3>Usage Tips</h3>
+                            <ul>
+                                <li><strong>Be specific in requests:</strong> Include clear action verbs and target platforms</li>
+                                <li><strong>Use platform-specific keywords:</strong> Include terms like "project," "task," "channel," "email," or "meeting"</li>
+                                <li><strong>For multi-step operations:</strong> Clearly outline the sequence you want ("First get X, then create Y")</li>
+                                <li><strong>For Slack operations:</strong> Always reference channels by name with the # prefix</li>
+                                <li><strong>For Asana operations:</strong> Be specific about project and task names</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="tutorial-section">
+                            <h3>System Capabilities</h3>
+                            
+                            <h4>Email Management</h4>
+                            <ul>
+                                <li>Retrieve, filter, count, and summarize emails</li>
+                                <li>Convert email content into Asana tasks/projects</li>
+                                <li>Search emails by sender, subject, or content</li>
+                            </ul>
+                            
+                            <h4>Slack Management</h4>
+                            <ul>
+                                <li>Create, archive, and unarchive channels</li>
+                                <li>Add/invite users to channels</li>
+                                <li>Retrieve and summarize channel messages</li>
+                                <li>Send messages to channels or users</li>
+                            </ul>
+                            
+                            <h4>Asana Management</h4>
+                            <ul>
+                                <li>Create, modify, and delete projects</li>
+                                <li>Add, update, and remove tasks</li>
+                                <li>List all projects and tasks</li>
+                            </ul>
+                            
+                            <h4>Calendar Management</h4>
+                            <ul>
+                                <li>Create and schedule meetings and events</li>
+                                <li>Search and retrieve calendar events</li>
+                                <li>Update and delete events</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/config.js"></script>
+</body>
+</html>

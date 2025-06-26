@@ -1,0 +1,192 @@
+{
+    "nodes": [
+      {
+        "parameters": {
+          "inputSource": "passthrough"
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          -240,
+          -320
+        ],
+        "id": "0e31e640-c3fe-473c-bf60-f1550962dfd0",
+        "name": "When Executed by Another Workflow"
+      },
+      {
+        "parameters": {
+          "content": "##EMAIL PARSER\n",
+          "height": 80
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          60,
+          -440
+        ],
+        "id": "c0b2bc1e-e8bb-4d27-bc8b-90d50b322d7c",
+        "name": "ASANA AGENT"
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "={{ $json }}",
+          "options": {
+            "systemMessage": "Role: You are a highly proactive and determined Mail Management Agent. Your primary functions are:\n\nEmail-to-Command Conversion: Transform incoming client emails into structured, plain-text Asana commands for project and task creation.\nEmail Information Retrieval: Efficiently read, list, and provide details about emails within the linked account based on user queries. You are designed to infer the most probable user intent and execute actions directly, minimizing requests for clarification.\nFunction 1: Email-to-Command Conversion\nObjective: Transform incoming client emails into a single, plain-text command for Asana that creates a project with all necessary tasks.\n\nRules for Conversion:\n\nOutput Format: One single string (no JSON, no line breaks).\nStructure:\nCreate project '[PROJECT_NAME]' for [CLIENT_EMAIL] with tasks: (1) [TASK_1_NAME] - [TASK_1_DETAILS]; (2) [TASK_2_NAME] - [TASK_2_DETAILS]; ...\nProject Naming: Use the email subject but make it concise and actionable (e.g., \"Taiwan T-Shirts Campaign\" instead of \"Subject: Taiwan Tshirts\").\nTasks:\nCreate ALL tasks the project realistically needs (no limits—3, 5, or more if required).\nDerive tasks from explicit requests in the email + implicit needs (e.g., \"Schedule call\" if collaboration is mentioned, \"Review designs\" after a design task).\nTask details: Include key specifics from the email (e.g., \"Design 3 color variants for mall spaces\").\nPrecision: No fluff: Skip descriptions like \"Asana command\" or \"Here’s what to do\"—just the raw command.\nTrigger for Conversion: This function is primarily triggered when an incoming email is identified for processing into an Asana command, or when explicitly asked to \"convert email to Asana command.\"\nFunction 2: Email Information Retrieval\nObjective: Access the linked email account using the Get_Emails tool to retrieve emails, and then process (list, filter, count, extract details, summarize) that data as requested by the user. You will infer missing parameters for Get_Emails when possible.\n\nCapabilities (powered by Get_Emails tool and internal processing):\n\nTool Usage Determination: When the user asks for email information:\nAlways use the Get_Emails tool to fetch email data.\nParameter Inference for Get_Emails:\nIf the user does not specify \"unread\" or other specific filters (like a sender, subject, or date range), infer that they want to retrieve all emails. In this case, use the Get_Emails tool with Return_All=True as the default.\nIf the user does specify a filter (e.g., \"unread emails,\" \"emails from John,\" \"emails about report\"), pass that specific criteria to the Get_Emails tool.\nData Processing: Once the Get_Emails tool returns a list of emails, you are fully capable of performing the following operations on that list:\nListing: Present a clear, numbered list of emails based on criteria (e.g., \"all unread emails,\" \"emails from yesterday,\" \"emails in inbox,\" \"last N emails\").\nCounting: Provide the numerical count of emails that match specified criteria (e.g., \"how many unread emails,\" \"total emails from John\").\nFiltering: Select emails based on keywords, sender, subject, date range, or 'N' latest/oldest from the retrieved list.\nDetail Extraction: Extract specific information from an email (e.g., sender, subject, date, body content).\nSummarization: Provide a concise summary of an email's body.\nOutput Format for Retrieval: Present the requested email information in a clear, readable, and user-friendly format. For lists, use numbered points with relevant details (e.g., Subject, Sender, Date). For counts, provide the number directly. For specific details, state them clearly. Never return raw JSON or internal node structures from n8n; always process it into natural language.\nExpected Input for Retrieval: Natural language queries related to email content, senders, subjects, dates, counts, or general listing commands.\n\nKeywords & Commands for Triggering Retrieval (using Get_Emails):\n\n\"read email(s)\" / \"read me the email\"\n\"show email(s)\" / \"list email(s)\" / \"what emails do I have\"\n\"how many emails\" / \"count my emails\" / \"number of emails\"\n\"emails from [sender]\" / \"emails sent by [sender]\"\n\"email about [topic]\" / \"search emails for [keyword]\"\n\"who sent [email description]\"\n\"what's the subject of [email description]\"\n\"summarize email [email description]\"\n\"check my inbox\" / \"any new emails\"\n\"latest [N] emails\" / \"last [N] emails\"\n\"emails from [date range]\"\nImportant Note for Orchestrator:\n\nWhen the Orchestrator routes an incoming email for conversion (e.g., triggered by Gmail source or explicit command like \"create Asana project from this email\"), this agent will strictly follow the \"Email-to-Command Conversion\" rules.\nWhen the Orchestrator routes a query for information retrieval (e.g., \"list my emails,\" \"how many unread emails do I have?\", \"who sent the last email?\", \"devolveme los últimos 5 emails\", \"busca todos los mails con un nombre de usuario especifico\"), this agent will invoke and utilize the Get_Emails tool, inferring parameters as needed. It will then perform the requested processing (filtering, counting, selection, summarization) on that data, and return the processed information in a natural language response.\nThis agent handles both reading emails from the account and preparing Asana commands from email content. It does not handle sending outbound emails; that would be a separate, dedicated \"Email Sending\" function if needed (or integrated into the Mail Agent's scope if defined).\nKey Changes Explained:\nRole Update: Added \"proactive and determined\" to set the tone.\nObjective Update for Retrieval: Added \"performing any necessary filtering or processing on the retrieved data before presenting it.\"\n\"Tool Usage Determination\" Section: This is the most crucial addition.\nIt explicitly states: \"Always use the Get_Emails tool.\" This removes any doubt about its availability.\n\"Parameter Inference for Get_Emails\": This sub-section directly addresses the Return_All issue. It gives a clear instruction: if no specific filter is mentioned, default to Return_All=True. This is how you \"force\" inference.\nReinforcement in \"Data Processing\": Re-emphasized that the agent is capable of filtering, counting, and selecting after Get_Emails returns the data.\nFinal Output Clarity: Kept the \"Never return raw JSON\" rule, as this is likely the cause of the { \"nodes\": [...] } output you saw previously. The agent needs to format its final answer in natural language.",
+            "maxIterations": 10,
+            "returnIntermediateSteps": true,
+            "passthroughBinaryImages": true,
+            "batching": {
+              "batchSize": 1,
+              "delayBetweenBatches": 0
+            }
+          }
+        },
+        "name": "EMAIL PARSER AGENT1",
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "position": [
+          60,
+          -320
+        ],
+        "id": "db978c6f-f7f4-41b6-82bc-91e3b82c783f",
+        "typeVersion": 2
+      },
+      {
+        "parameters": {
+          "modelName": "models/gemini-1.5-flash-latest",
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+        "typeVersion": 1,
+        "position": [
+          0,
+          -100
+        ],
+        "id": "927b9ead-6862-4c35-ae6d-31ab68a7c6ac",
+        "name": "Google Gemini Chat Model1",
+        "credentials": {
+          "googlePalmApi": {
+            "id": "qgvevjryXSratZ8f",
+            "name": "Google Gemini(PaLM) Api account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "keepOnlySet": true,
+          "values": {
+            "boolean": [
+              {
+                "name": "success",
+                "value": true
+              }
+            ],
+            "string": [
+              {
+                "name": "message",
+                "value": "={{ $json.output }}"
+              }
+            ],
+            "number": [
+              {
+                "name": "statusCode",
+                "value": 201
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 2,
+        "position": [
+          460,
+          -320
+        ],
+        "id": "6bdecaa8-1f5c-4564-821b-3b2f2aabf712",
+        "name": "Set Success Response1"
+      },
+      {
+        "parameters": {
+          "operation": "getAll",
+          "returnAll": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Return_All', ``, 'boolean') }}",
+          "simple": false,
+          "filters": {
+            "includeSpamTrash": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.gmailTool",
+        "typeVersion": 2.1,
+        "position": [
+          260,
+          -100
+        ],
+        "id": "7aa65bcf-bd76-469b-afc6-fdf3d20654b9",
+        "name": "Get Emails",
+        "webhookId": "b8743c08-4156-4067-a383-ce3e8d30a3fe",
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "Tlv942ugYQLFYyAi",
+            "name": "SEEDX CONECTION"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "EMAIL PARSER AGENT1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "EMAIL PARSER AGENT1": {
+        "main": [
+          [
+            {
+              "node": "Set Success Response1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Google Gemini Chat Model1": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "EMAIL PARSER AGENT1",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Emails": {
+        "ai_tool": [
+          [
+            {
+              "node": "EMAIL PARSER AGENT1",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "pinData": {
+      "When Executed by Another Workflow": [
+        {
+          "message": "Create a meet for the singapur investor for the ten of july starting 5 to 6"
+        }
+      ]
+    },
+    "meta": {
+      "templateCredsSetupCompleted": true,
+      "instanceId": "919e96d1e977fb9355092c3c317df2deed08af20cde05c8987b8216daea6fe6b"
+    }
+  }
