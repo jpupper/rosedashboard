@@ -77,6 +77,11 @@ router.post('/', authMiddleware, adminMiddleware, async (req, res) => {
         });
 
         await task.save();
+
+        // Actualizar el array de tareas en el proyecto
+        project.tasks.push(task._id);
+        await project.save();
+
         await task.populate('assignedUsers', 'name username');
         
         res.status(201).json(task);
@@ -141,6 +146,13 @@ router.delete('/:id', authMiddleware, adminMiddleware, async (req, res) => {
         const task = await Task.findById(req.params.id);
         if (!task) {
             return res.status(404).json({ message: 'Tarea no encontrada' });
+        }
+
+        // Eliminar la referencia de la tarea en el proyecto
+        const project = await Project.findById(task.project);
+        if (project) {
+            project.tasks = project.tasks.filter(t => t.toString() !== task._id.toString());
+            await project.save();
         }
 
         await Task.findByIdAndDelete(req.params.id);

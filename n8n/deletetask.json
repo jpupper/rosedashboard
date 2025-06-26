@@ -1,0 +1,90 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "method": "DELETE",
+        "url": "=https://app.asana.com/api/1.0/tasks/{{$json.taskGid}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "asanaOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        960,
+        -500
+      ],
+      "name": "Delete Asana Task",
+      "id": "11f08864-6a3a-4fd3-8231-2ed45796e38a",
+      "credentials": {
+        "asanaOAuth2Api": {
+          "id": "TQNFR8fnB46O5o1Q",
+          "name": "Asana account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "boolean": [
+            {
+              "name": "success",
+              "value": true
+            }
+          ],
+          "string": [
+            {
+              "name": "message",
+              "value": "=Task deleted successfully"
+            }
+          ],
+          "number": [
+            {
+              "name": "statusCode",
+              "value": 200
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        1220,
+        -500
+      ],
+      "id": "5f248cfe-70f7-4961-b7d3-6d055eca0958",
+      "name": "Set Success Response",
+      "alwaysOutputData": true,
+      "executeOnce": true
+    }
+  ],
+  "connections": {
+    "Delete Asana Task": {
+      "main": [
+        [
+          {
+            "node": "Set Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "919e96d1e977fb9355092c3c317df2deed08af20cde05c8987b8216daea6fe6b"
+  }
+}
