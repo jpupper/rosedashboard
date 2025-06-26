@@ -1,0 +1,253 @@
+{
+    "nodes": [
+      {
+        "parameters": {
+          "calendar": {
+            "__rl": true,
+            "value": "xseedx2025@gmail.com",
+            "mode": "list",
+            "cachedResultName": "xseedx2025@gmail.com"
+          },
+          "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+          "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+          "useDefaultReminders": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Use_Default_Reminders', ``, 'boolean') }}",
+          "additionalFields": {
+            "description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Description', ``, 'string') }}",
+            "summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Summary', ``, 'string') }}"
+          }
+        },
+        "id": "27a9d2be-6df7-4102-8498-a1572b6192f1",
+        "name": "Create Event",
+        "type": "n8n-nodes-base.googleCalendarTool",
+        "position": [
+          1800,
+          420
+        ],
+        "typeVersion": 1.3,
+        "credentials": {
+          "googleCalendarOAuth2Api": {
+            "id": "cM4sdcC2YofpS5p2",
+            "name": "Google Account Seedx"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "delete",
+          "calendar": {
+            "__rl": true,
+            "value": "xseedx2025@gmail.com",
+            "mode": "list",
+            "cachedResultName": "xseedx2025@gmail.com"
+          },
+          "eventId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Event_ID', ``, 'string') }}",
+          "options": {}
+        },
+        "id": "94549cb3-a2e2-44d7-847a-8d6c05c487df",
+        "name": "Delete Event",
+        "type": "n8n-nodes-base.googleCalendarTool",
+        "position": [
+          1640,
+          420
+        ],
+        "typeVersion": 1.3,
+        "credentials": {
+          "googleCalendarOAuth2Api": {
+            "id": "cM4sdcC2YofpS5p2",
+            "name": "Google Account Seedx"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "calendar": {
+            "__rl": true,
+            "value": "xseedx2025@gmail.com",
+            "mode": "list",
+            "cachedResultName": "xseedx2025@gmail.com"
+          },
+          "eventId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Event_ID', ``, 'string') }}",
+          "updateFields": {
+            "description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Description', ``, 'string') }}",
+            "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+            "location": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Location', ``, 'string') }}",
+            "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+            "summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Summary', ``, 'string') }}"
+          }
+        },
+        "id": "ebbdf519-afe4-4a18-9dfd-e1ce55ab86c1",
+        "name": "Update Event",
+        "type": "n8n-nodes-base.googleCalendarTool",
+        "position": [
+          1480,
+          420
+        ],
+        "typeVersion": 1.3,
+        "credentials": {
+          "googleCalendarOAuth2Api": {
+            "id": "cM4sdcC2YofpS5p2",
+            "name": "Google Account Seedx"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "={{ $json }}",
+          "options": {
+            "systemMessage": "=Overview\nYou are the Master Calendar Agent, your objective is to manage all Google Calendar operations: create, update, delete, search, and retrieve events. You are designed to understand natural language commands and execute the appropriate calendar actions using your specialized tools.\n\n\n\n\nTools : \n-Get Events\n-Search Events\n-Update Event\n-Delete Event\n-Create Event. \n\nGeneral Rules : \n-Always run Get events and analize the data of the projects, once you have the list output that list and focus on the query by the user. Get events will always provide you an id of the proyect use that one for the update event node . \n"
+          }
+        },
+        "id": "6a83b5d5-91be-4bab-ba26-785fce716c96",
+        "name": "AI Agent",
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "position": [
+          1340,
+          160
+        ],
+        "typeVersion": 1.8
+      },
+      {
+        "parameters": {
+          "inputSource": "passthrough"
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          1060,
+          160
+        ],
+        "id": "ef00c2cc-a6b2-476d-9422-288755a14359",
+        "name": "When Executed by Another Workflow"
+      },
+      {
+        "parameters": {
+          "modelName": "models/gemini-2.5-flash",
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+        "typeVersion": 1,
+        "position": [
+          1160,
+          420
+        ],
+        "id": "5f72b344-40bf-4566-a5a5-2a9b38120a04",
+        "name": "Google Gemini Chat Model1",
+        "credentials": {
+          "googlePalmApi": {
+            "id": "qgvevjryXSratZ8f",
+            "name": "Google Gemini(PaLM) Api account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "getAll",
+          "calendar": {
+            "__rl": true,
+            "value": "xseedx2025@gmail.com",
+            "mode": "list",
+            "cachedResultName": "xseedx2025@gmail.com"
+          },
+          "returnAll": true,
+          "timeMin": "2024-03-25T22:21:12",
+          "timeMax": "2026-07-02T22:21:12",
+          "options": {}
+        },
+        "id": "d5363f2a-286d-4c98-8578-dd01c0d0bd23",
+        "name": "Get Events",
+        "type": "n8n-nodes-base.googleCalendarTool",
+        "position": [
+          1320,
+          420
+        ],
+        "typeVersion": 1.3,
+        "credentials": {
+          "googleCalendarOAuth2Api": {
+            "id": "cM4sdcC2YofpS5p2",
+            "name": "Google Account Seedx"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Create Event": {
+        "ai_tool": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Delete Event": {
+        "ai_tool": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Update Event": {
+        "ai_tool": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Google Gemini Chat Model1": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Events": {
+        "ai_tool": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "pinData": {
+      "When Executed by Another Workflow": [
+        {
+          "message": "update the Meet for the Ukranian President to be called : Meet for the Brazil president"
+        }
+      ]
+    },
+    "meta": {
+      "templateCredsSetupCompleted": true,
+      "instanceId": "919e96d1e977fb9355092c3c317df2deed08af20cde05c8987b8216daea6fe6b"
+    }
+  }

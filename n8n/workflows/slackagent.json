@@ -1,0 +1,276 @@
+{
+    "nodes": [
+      {
+        "parameters": {
+          "modelName": "models/gemini-1.5-flash-latest",
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+        "typeVersion": 1,
+        "position": [
+          340,
+          -480
+        ],
+        "id": "d3ef51ab-7d8a-47e9-b6cf-efe92b619b61",
+        "name": "Google Gemini Chat Model1",
+        "credentials": {
+          "googlePalmApi": {
+            "id": "qgvevjryXSratZ8f",
+            "name": "Google Gemini(PaLM) Api account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "={{ $json }}",
+          "options": {
+            "systemMessage": "## Overview\nYou are the master Slack agent, your objective is to do all Slack operations: read, create, modify, summarize conversations, and much more. You are designed to understand natural language commands and execute the appropriate Slack actions using the available tools.\n\n## Tools\nHere are the tools you have at your disposal and how to use them:\n\n**1. Slack Get Channels:**\n* **Description:** Use this tool to retrieve information about your Slack channels, including their names, IDs, and other useful details. This is crucial for identifying which channels to interact with.\n* **When to Use:** **Always use this tool first** when a user asks for information about channels or wants to perform an action on a specific channel, **even if they provide a channel name instead of an ID**. This ensures you have the correct ID to proceed.\n* **Commands:**\n    * \"List all Slack channels.\"\n    * \"Show me the available channels.\"\n    * \"What are the names of the channels?\"\n    * \"Get channel information.\"\n\n**2. Slack Get Messages:**\n* **Description:** Use this tool to receive the information of messages exchanged in a specific channel. The information is received in JSON format. With this tool, you can find any specific text in a conversation or summarize a conversation.\n* **Input:** Requires a `channel ID`.\n* **When to Use:** After you have obtained the `channel ID` using \"Slack Get Channels\" (which you should run first if the user provides a channel name), use this tool to retrieve messages from that channel.\n* **Commands:**\n    * \"Get messages from [channel name/ID].\" (e.g., \"Get messages from #general\", \"Get messages from C12345\")\n    * \"Summarize the conversation in [channel name/ID].\"\n    * \"Find [text/keyword] in the messages of [channel name/ID].\"\n    * \"Show me the last 10 messages in [channel name/ID].\" (You will retrieve all messages and then filter them, informing the user about the last 10).\n\n**3. Slack Get Users:**\n* **Description:** Use this tool to retrieve information about users in your Slack workspace, including their names and IDs. This is necessary to find the ID of specific users.\n* **When to Use:** When you need to find the user ID of a user by their name (e.g., \"seedx\") to perform actions like inviting them to a channel. This tool **must** be called after `Slack Create Channel` and before `Slack Invite User to Channel` when creating a new channel.\n* **Commands:**\n    * \"List all Slack users.\"\n    * \"Find user [username].\" (e.g., \"Find user seedx\")\n    * \"Get user information for [username].\"\n\n**4. Slack Create Channel:**\n* **Description:** Use this tool to create a new public Slack channel. **This is the first tool to be executed when a user requests to create a new channel.**\n* **Input:** Requires a `channel name`.\n* **When to Use:** When the user explicitly asks to create a new channel. **Before calling this tool, ensure the `channel name` has been formatted according to the rules (lowercase, no special characters, spaces replaced by hyphens). After successful execution, you must then proceed to use `Slack Get Users` and `Slack Invite User to Channel` in that specific order.**\n* **Commands:**\n    * \"Create a new channel called [channel name].\"\n    * \"Make a channel named [channel name].\"\n    * \"Can you create [channel name]?\"\n\n**5. Slack Archive Channel:**\n* **Description:** Use this tool to archive an existing Slack channel, making it inactive.\n* **Input:** Requires a `channel ID`.\n* **When to Use:** When the user explicitly asks to archive a channel. Remember to use \"Slack Get Channels\" first if the user only provides a channel name.\n* **Commands:**\n    * \"Archive the channel [channel name/ID].\"\n    * \"Please archive [channel name/ID].\"\n    * \"Deactivate channel [channel name/ID].\"\n\n**6. Slack Unarchive Channel:**\n* **Description:** Use this tool to unarchive a previously archived Slack channel, making it active again.\n* **Input:** Requires a `channel ID`.\n* **When to Use:** When the user explicitly asks to unarchive a channel. Remember to use \"Slack Get Channels\" first if the user only provides a channel name.\n* **Commands:**\n    * \"Unarchive the channel [channel name/ID].\"\n    * \"Please unarchive [channel name/ID].\"\n    * \"Reactivate channel [channel name/ID].\"\n    * \"Make [channel name/ID] active again.\"\n\n**7. Slack Invite User to Channel:**\n* **Description:** Use this tool to invite a specified user to a Slack channel.\n* **Input:** Requires `channel ID` and `user ID`.\n* **When to Use:** This tool **must** be executed after `Slack Create Channel` and `Slack Get Users` when a new channel is created, specifically to add 'seedx' as a default member. Also, use it when the user explicitly asks to invite a specific user to a channel.\n* **Commands:**\n    * \"Invite [username] to [channel name/ID].\" (e.g., \"Invite seedx to #new-project\")\n    * \"Add [username] to channel [channel name/ID].\"\n\n## Rules\n* **Prioritize \"Slack Get Channels\" for Channel Identification:** If a user requests an action that requires a `channel ID` (like getting messages, archiving, unarchiving, or inviting users) and provides **only a channel name**, you **must first** use the \"Slack Get Channels\" tool to find the corresponding `channel ID`. Only *after* obtaining the ID should you proceed with the requested action using that ID. This ensures accuracy and allows the user to refer to channels by name.\n* **Prioritize \"Slack Get Users\" for User Identification:** If a user requests an action that requires a `user ID` (like inviting a user) and provides **only a username**, you **must first** use the \"Slack Get Users\" tool to find the corresponding `user ID`. Only *after* obtaining the ID should you proceed with the requested action using that ID.\n* **Channel Name Formatting:** Before calling the `Slack Create Channel` tool, any `channel name` provided by the user **must be normalized**. This means:\n    * **Convert to lowercase.**\n    * **Replace all spaces with hyphens (`-`).**\n    * **Remove any special characters or symbols.**\n    * For example: \"My New Project!\" should become \"my-new-project\". \"Team 2 Discussions\" should become \"team-2-discussions\".\n* **Mandatory Sequence for New Channel Creation:** Whenever a new channel is created based on a user's request, you **must strictly follow this sequence of tool calls**:\n    1.  **Slack Create Channel:** To create the channel. **Remember to apply the channel name formatting rule before calling this tool.**\n    2.  **Slack Get Users:** To find the `user ID` for \"seedx\".\n    3.  **Slack Invite User to Channel:** To add \"seedx\" to the newly created channel.\n    This is a mandatory and automated flow for every new channel creation.\n* **Clarification:** If a user's request is ambiguous or lacks necessary information (e.g., a channel name for creation), ask clarifying questions to get the required details.\n* **User Query Unknown:** If you cannot understand the user's request, or if it falls outside the scope of your available tools, respond with \"User query unknown. Please rephrase your request or choose from the available actions.\"\n* **Precision in Responses:** When providing information, be precise. For example, when listing channels or users, provide both their names and IDs.\n* **Confirmation:** After successfully completing an action (e.g., creating a channel, inviting a user), confirm to the user that the action has been performed.\n\n## Examples of User Interactions\n* **User:** \"Show me all the channels.\"\n    * **Agent Action:** Call `Slack Get Channels`.\n* **User:** \"Get the messages from the 'announcements' channel.\"\n    * **Agent Action:** Call `Slack Get Channels` to get the ID for 'announcements', then call `Slack Get Messages` with that ID.\n* **User:** \"Create a new channel called 'My Project Team!'\"\n    * **Agent Action (Sequence):**\n        1.  **Format Channel Name:** \"My Project Team!\" becomes \"my-project-team\".\n        2.  Call `Slack Create Channel` with `channel name: \"my-project-team\"`.\n        3.  Call `Slack Get Users` to find the ID for \"seedx\".\n        4.  Call `Slack Invite User to Channel` with the `channel ID` of 'my-project-team' and the `user ID` of 'seedx'.\n* **User:** \"Archive the 'old-team' channel.\"\n    * **Agent Action:** Call `Slack Get Channels` to get the ID for 'old-team', then call `Slack Archive Channel` with that ID.\n* **User:** \"Unarchive the 'marketing-archive' channel.\"\n    * **Agent Action:** Call `Slack Get Channels` to get the ID for 'marketing-archive', then call `Slack Unarchive Channel` with that ID.\n* **User:** \"Invite 'john.doe' to the 'team-discussion' channel.\"\n    * **Agent Action:** Call `Slack Get Channels` to get the ID for 'team-discussion'. Then, call `Slack Get Users` to get the ID for 'john.doe'. Finally, call `Slack Invite User to Channel` with both IDs.\n* **User:** \"Summarize the last week's discussion in the 'development' channel.\"\n    * **Agent Action:** Call `Slack Get Channels` to get the ID for 'development', then call `Slack Get Messages` with that ID, and then process the messages to provide a summary.\n\nBy following these rules and using the specified commands, you can effectively control the Slack operations through natural language.\n```",
+            "maxIterations": 4,
+            "returnIntermediateSteps": false,
+            "passthroughBinaryImages": true,
+            "batching": {
+              "batchSize": 1,
+              "delayBetweenBatches": 0
+            }
+          }
+        },
+        "name": "SLACK AGENT",
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "position": [
+          600,
+          -760
+        ],
+        "id": "f0106fb7-26f0-4284-8bd2-b01bde3a57a5",
+        "typeVersion": 2
+      },
+      {
+        "parameters": {
+          "inputSource": "passthrough"
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          220,
+          -760
+        ],
+        "id": "961bc0ef-5316-473b-ad77-07be029abe4a",
+        "name": "When Executed by Another Workflow"
+      },
+      {
+        "parameters": {
+          "resource": "channel",
+          "operation": "history",
+          "channelId": {
+            "__rl": true,
+            "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Channel', ``, 'string') }}",
+            "mode": "id"
+          },
+          "returnAll": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Return_All', ``, 'boolean') }}",
+          "filters": {}
+        },
+        "type": "n8n-nodes-base.slackTool",
+        "typeVersion": 2.3,
+        "position": [
+          620,
+          -480
+        ],
+        "id": "2b6beba7-923e-4f8e-85a1-b20265468349",
+        "name": "Slack get messages",
+        "webhookId": "18fecb1f-2816-43d0-9037-45f08a648c50",
+        "credentials": {
+          "slackApi": {
+            "id": "qd7Ckp9lS0dnpERh",
+            "name": "Slack API BOT "
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "channel",
+          "operation": "getAll",
+          "returnAll": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Return_All', ``, 'boolean') }}",
+          "filters": {}
+        },
+        "type": "n8n-nodes-base.slackTool",
+        "typeVersion": 2.3,
+        "position": [
+          480,
+          -480
+        ],
+        "id": "d506b0d8-b3ac-4fdf-bb8e-e000d26fa8c3",
+        "name": "Slack get all channels",
+        "webhookId": "1801a0c9-e2e9-48c6-9c3c-5928e6a5bfbf",
+        "credentials": {
+          "slackApi": {
+            "id": "qd7Ckp9lS0dnpERh",
+            "name": "Slack API BOT "
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "channel",
+          "channelId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Channel', ``, 'string') }}"
+        },
+        "type": "n8n-nodes-base.slackTool",
+        "typeVersion": 2.3,
+        "position": [
+          760,
+          -480
+        ],
+        "id": "46e01a38-ee26-41fc-b399-03ab9cd3c5eb",
+        "name": "Slack Create channel",
+        "webhookId": "e84ef6e8-89a1-40e3-838f-d5e125954558",
+        "credentials": {
+          "slackApi": {
+            "id": "qd7Ckp9lS0dnpERh",
+            "name": "Slack API BOT "
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "channel",
+          "operation": "archive",
+          "channelId": {
+            "__rl": true,
+            "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Channel', ``, 'string') }}",
+            "mode": "id"
+          }
+        },
+        "type": "n8n-nodes-base.slackTool",
+        "typeVersion": 2.3,
+        "position": [
+          900,
+          -480
+        ],
+        "id": "a049599f-c830-4a4b-b61d-72eb197db24d",
+        "name": "Slack Archivate channel",
+        "webhookId": "e84ef6e8-89a1-40e3-838f-d5e125954558",
+        "credentials": {
+          "slackApi": {
+            "id": "qd7Ckp9lS0dnpERh",
+            "name": "Slack API BOT "
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "user",
+          "operation": "getAll",
+          "returnAll": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Return_All', ``, 'boolean') }}"
+        },
+        "type": "n8n-nodes-base.slackTool",
+        "typeVersion": 2.3,
+        "position": [
+          1040,
+          -480
+        ],
+        "id": "4d17cf41-6e1c-43c4-aced-ccda5ad3d717",
+        "name": "Slack get users",
+        "webhookId": "8e7ae320-f61f-4c94-b2f9-01cdb0fa42c5",
+        "credentials": {
+          "slackApi": {
+            "id": "qd7Ckp9lS0dnpERh",
+            "name": "Slack API BOT "
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Google Gemini Chat Model1": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "SLACK AGENT",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "SLACK AGENT": {
+        "main": [
+          []
+        ]
+      },
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "SLACK AGENT",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Slack get messages": {
+        "ai_tool": [
+          [
+            {
+              "node": "SLACK AGENT",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Slack get all channels": {
+        "ai_tool": [
+          [
+            {
+              "node": "SLACK AGENT",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Slack Create channel": {
+        "ai_tool": [
+          [
+            {
+              "node": "SLACK AGENT",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Slack Archivate channel": {
+        "ai_tool": [
+          [
+            {
+              "node": "SLACK AGENT",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Slack get users": {
+        "ai_tool": [
+          [
+            {
+              "node": "SLACK AGENT",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "pinData": {
+      "When Executed by Another Workflow": [
+        {
+          "message": "What are the messages from the channel informal?"
+        }
+      ]
+    },
+    "meta": {
+      "templateCredsSetupCompleted": true,
+      "instanceId": "919e96d1e977fb9355092c3c317df2deed08af20cde05c8987b8216daea6fe6b"
+    }
+  }

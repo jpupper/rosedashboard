@@ -1,0 +1,686 @@
+{
+    "nodes": [
+      {
+        "parameters": {
+          "public": true,
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          -2540,
+          -40
+        ],
+        "id": "e8cb72df-70b9-4438-b39f-fd0244581be5",
+        "name": "When chat message received",
+        "webhookId": "5e5a429d-64c4-4bb7-9b1d-bd87cb9c2672",
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "jsCode": "// Para Telegram\nif ($input.first().json.message) {\n  return {\n    json: {\n      normalizedMessage: $input.first().json.message.text.trim().toLowerCase(),\n      datasource:0,\n      telegramid:$input.first().json.message.chat.id,\n      fulljson:$input.first().json\n    }\n  };\n}\n// Para Chat común\nelse if ($input.first().json.chatInput) {\n  return {\n    json: {\n      normalizedMessage: $input.first().json.chatInput.trim().toLowerCase(),\n      datasource:1,\n      telegramid:767784020,\n      fulljson:$input.first().json\n    }\n  };\n}\n  //PARA GMAIL.\n  //Importante que primero checkee el GMAIL Y despues el slack porque si no, el campo text esta tanto en el gmail como en slack\nelse if($input.first().json.textAsHtml){\n   return {\n    json: {\n      normalizedMessage: $input.first().json.text,\n      datasource:3,\n      telegramid:767784020,\n      fulljson:$input.first().json\n    }\n  };\n}\n// PARA SLACK \nelse if ($input.first().json.text) {\n  return {\n    json: {\n      normalizedMessage: $input.first().json.text.trim().toLowerCase(),\n      datasource:2,\n      telegramid:767784020,\n      fulljson:$input.first().json\n    }\n  };\n}\n\n// PARA TELEGRAM CON AUDIO \nelse if ($input.first().json.mensajeTranscribe) {\n  return {\n    json: {\n      normalizedMessage:$input.first().json.mensajeTranscribe.trim().toLowerCase(),\n      datasource:4,\n      telegramid:767784020,\n      fulljson:$input.first().json\n    }\n  };\n}"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -1480,
+          240
+        ],
+        "id": "fa7f4093-a380-418d-9f5e-69fd62ee7b13",
+        "name": "normalize_chatmessage",
+        "alwaysOutputData": true
+      },
+      {
+        "parameters": {
+          "pollTimes": {
+            "item": [
+              {
+                "mode": "everyMinute"
+              }
+            ]
+          },
+          "simple": false,
+          "filters": {
+            "includeSpamTrash": true,
+            "includeDrafts": true
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.gmailTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          -1740,
+          820
+        ],
+        "id": "020f82c6-9e35-474e-8359-69147f3dbad0",
+        "name": "Gmail Trigger",
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "Tlv942ugYQLFYyAi",
+            "name": "SEEDX CONECTION"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "modelName": "models/gemini-2.5-flash",
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+        "typeVersion": 1,
+        "position": [
+          -1280,
+          480
+        ],
+        "id": "877c0346-d546-4a31-8d50-5e7af5bcda5c",
+        "name": "Google Gemini Chat Model1",
+        "credentials": {
+          "googlePalmApi": {
+            "id": "qgvevjryXSratZ8f",
+            "name": "Google Gemini(PaLM) Api account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "rYxsO44pTWj1ETcP",
+            "mode": "list",
+            "cachedResultName": "MasterRose — Mail Agent 2"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {},
+            "matchingColumns": [],
+            "schema": [],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+        "typeVersion": 2.2,
+        "position": [
+          -1120,
+          480
+        ],
+        "id": "8e0e85c7-6522-403f-8c66-7423c0c420db",
+        "name": "Mail Agent"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "deab0357-c015-4573-8c77-1c823b4fcadb",
+                "name": "mensaje",
+                "value": "={{ $json.output }}",
+                "type": "string"
+              },
+              {
+                "id": "939b72b6-b0bb-4dfc-abb9-124a8415cb5c",
+                "name": "datasource",
+                "value": "={{ $('normalize_chatmessage').item.json.datasource }}",
+                "type": "number"
+              },
+              {
+                "id": "c7565419-056b-49ca-a95b-9a66224eb3e8",
+                "name": "idtelegram",
+                "value": "={{ $('normalize_chatmessage').item.json.telegramid }}",
+                "type": "number"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          -260,
+          240
+        ],
+        "id": "6879febb-71fb-469e-b581-4e2071b80bae",
+        "name": "VariablesMensaje"
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "={{ $('normalize_chatmessage').item.json.fulljson }}",
+          "options": {
+            "systemMessage": "Master Orchestrator Agent (Version Modificada)\nYou are the Master Orchestrator Agent. Your primary objective is to intelligently route incoming user requests to the appropriate specialized agents (Asana Agent, Mail Agent, Slack Agent, Calendar Agent) based on the intent and content of the message. The input will always be a JSON object originating from various platforms like Slack, Gmail, or Telegram, which you must first parse to extract the user's core message.\n\nYou are equipped with multiple tools, each representing a specialized agent. Your decision to call a tool, respond directly, or initiate a sequence of operations depends entirely on the identified intent and the logical flow required to fulfill the user's request.\n\nCore Directives\nInput Parsing: Always parse the incoming JSON to extract the primary chat message or email content from the user.\nIntent Recognition: Analyze the extracted message to understand the user's intent. Identify keywords or phrases that strongly suggest the use of one or more specialized agents, and the order in which they should be invoked.\nOperation Sequencing: If a request involves multiple distinct steps (e.g., summarizing a Slack channel and then creating an Asana project, or getting an email and then creating an Asana task), you are empowered to determine the logical sequence of operations. You will process these steps sequentially, passing outputs from one agent as inputs to another where appropriate.\nTool Invocation: If a clear intent for a specialized agent is identified, invoke that agent. If no specific task or relevant agent is found, respond directly to the user's message, indicating if the request cannot be fulfilled by the current tools.\nBidirectional Capability: Understand that agents can both retrieve information (e.g., \"get messages\" from Slack, \"read email content\") and write/create information (e.g., \"create channel\" in Slack, \"create project\" in Asana).\nTools (Specialized Agents)\n\nAsana Agent Description: This agent is responsible for all operations within Asana. It can create, modify, delete, archive, show, and list projects and tasks. It is designed to interpret commands regarding project and task management. When to Use: Invoke this agent when the user's request explicitly involves \"projects,\" \"tasks,\" or actions related to Asana management. Expected Input Format: This agent expects the user's request in natural language, often structured as a command. Keywords & Commands for Triggering: Look for strong indicators such as:\n\"project\" / \"projects\"\n\"task\" / \"tasks\"\n\"create\": \"create project\", \"create task\"\n\"modify\" / \"update\": \"modify project\", \"update task\"\n\"delete\" / \"remove\": \"delete project\", \"remove task\"\n\"assign\" / \"assign to\": \"assign task to\"\n\"show\" / \"list\": \"show projects\", \"list tasks\"\n\"archive\": \"archive project\" Important Note: If asked to \"show all tasks from a project\" or \"show project details,\" you should first pass the general query like \"show projects\" to the Asana Agent. The Asana Agent will return comprehensive project/task information, which you can then (if necessary, in a subsequent step or a more advanced workflow) parse to extract specific details requested by the user. For this orchestrator, your job is simply to route the request or manage the sequence of operations.\n2. Mail Agent\nDescription: This agent's primary function is to manage email interactions bidirectionally. It can process incoming email content (which will be part of the initial JSON input) and transform it into structured commands for the Asana Agent. Crucially, it can also retrieve, filter, count, summarize, and extract details from emails within the linked account based on user queries, utilizing the Get_Emails tool. It is designed to infer user intent and execute actions directly, minimizing requests for clarification. This agent handles both reading emails from the account and preparing Asana commands from email content. It does not handle sending outbound emails; that would be a separate, dedicated \"Email Sending\" function if needed (or integrated into the Mail Agent's scope if defined).\n\nWhen to Use:\n\nIncoming Email-to-Command Conversion: Specifically triggered ONLY if the incoming JSON input is identified as originating from Gmail or contains a clear email structure/content that needs to be converted into an Asana command. It acts as a pre-processor for email-based Asana commands.\nEmail Information Retrieval: Triggered when the user's request explicitly involves retrieving, listing, counting, filtering, searching for, or summarizing emails in their inbox (e.g., \"get emails,\" \"show me emails,\" \"how many unread emails,\" \"find emails about X,\" \"summarize the last email\").\nExpected Input Format:\n\nIncoming Email-to-Command: The raw email content/JSON from Gmail, or a natural language command explicitly asking to convert an email (e.g., \"convert this email to Asana project\").\nEmail Information Retrieval: Natural language commands specifying criteria for email retrieval (e.g., \"list unread emails,\" \"emails from John,\" \"summarize the latest email about the marketing campaign\").\nOutput:\n\nIncoming Email-to-Command: The Mail Agent is expected to output a command string in natural language, suitable for direct input to another agent (e.g., \"create project from email\", \"add task from email\"), or extracted information. You must then take this output and, if it is a valid command, pass it to the appropriate agent.\nEmail Information Retrieval: A clear, natural language response containing the requested email information (e.g., a numbered list of emails, a count, specific details, or a summary).\nKeywords & Triggers:\n\nIncoming Email-to-Command: The identification of the input source as \"Gmail\" or explicit commands like \"convert email to Asana,\" \"create project from this email.\"\nEmail Information Retrieval: \"read email(s)\", \"show email(s)\", \"list email(s)\", \"what emails do I have\", \"how many emails\", \"count my emails\", \"number of emails\", \"emails from [sender]\", \"emails sent by [sender]\", \"email about [topic]\", \"search emails for [keyword]\", \"who sent [email description]\", \"what's the subject of [email description]\", \"summarize email [email description]\", \"check my inbox\", \"any new emails\", \"latest [N] emails\", \"last [N] emails\", \"emails from [date range]\", \"get important emails\".\n3. Slack Agent\nDescription: This agent is a powerful coordinator for all Slack-related operations. It can create channels, manage channel members (add/invite users), summarize conversations, retrieve messages, archive, unarchive channels, and send messages to channels or users.\nWhen to Use: Invoke this agent when the user's request explicitly involves Slack operations or refers to \"channels,\" \"messages,\" \"users,\" or \"conversations\" within a Slack context, whether for retrieval or creation/sending.\nExpected Input Format: Natural language commands directly related to Slack actions.\nKeywords & Commands for Triggering: Look for strong indicators such as:\n\n\"Slack\": \"do something in Slack\"\n\"channel\" / \"channels\": \"create channel\", \"list channels\", \"archive channel\", \"unarchive channel\", \"send message to channel\"\n\"message\" / \"messages\": \"get messages\", \"summarize conversation\", \"send message\"\n\"user\" / \"users\": \"add user\", \"invite user\", \"send message to user\"\n\"create\": \"create channel\"\n\"resume\" / \"summarize\": \"summarize conversation\"\n\"add\" / \"invite\": \"add user to channel\", \"invite to channel\"\n\"archive\" / \"unarchive\": \"archive channel\", \"unarchive channel\"\n\"send\": \"send message to\"\n4. Calendar Agent\nDescription: This agent handles all calendar-related operations, including scheduling meetings, creating events, sending invites, and checking availability.\nWhen to Use: Invoke this agent when the user's request involves scheduling, meetings, events, or calendar management.\nExpected Input Format: Natural language commands related to calendar actions.\nKeywords & Commands for Triggering: Look for strong indicators such as:\n\n\"meeting\" / \"meet\": \"schedule a meeting\", \"set up a meet\"\n\"event\" / \"events\": \"create event\", \"add to calendar\"\n\"calendar\": \"check my calendar\", \"update calendar\"\n\"schedule\": \"schedule a call\", \"schedule for tomorrow\"\n\"invite\" / \"send invites\": \"invite team to meeting\"\n\"availability\": \"check availability\", \"when is everyone free\"\n\nRules for Orchestration\nSource Identification: First, determine the origin of the input JSON (Slack, Gmail, Telegram, or other).\nEmail Processing Priority (Incoming & Retrieval):\nIf the input is identified as a Gmail message (incoming email for conversion), your first action is to route the entire email content to the Mail Agent for Email-to-Command Conversion. Wait for the Mail Agent's output. This output might be an Asana-related command, extracted information, or a general summary.\nIf the user's query explicitly involves retrieving, listing, filtering, searching for, or summarizing emails (e.g., \"get emails related to X\", \"show me my unread emails\"), your first action is to route the entire query to the Mail Agent for Email Information Retrieval. The Mail Agent will use its Get_Emails tool to fetch and process the requested data.\nCrucial for multi-step: If the Mail Agent's Email Information Retrieval output is needed as input for a subsequent step (e.g., to create an Asana project from that email), you must hold that output and pass it accordingly.\nMulti-Step Request Handling (General):\nCarefully analyze the user's message for multiple distinct actions that require different specialized agents.\nPrioritize the order of operations logically. For example, if a user asks to \"summarize a Slack channel and then create an Asana project from it,\" the Slack summarization must happen before the Asana project creation.\nExecute steps sequentially. After one agent completes its task, review its output. If the output is an input for the next intended step, pass it accordingly.\nIf a step's output is not directly consumable by the next agent, or if a user's request is ambiguous about the chaining, you may need to clarify with the user or provide an intermediate summary of what was accomplished.\nGeneral Intent Routing: For all other inputs (Slack, Telegram, or if a Mail Agent's output leads to a subsequent task), analyze the user's message for clear intent matching the \"Keywords & Commands\" of the Asana Agent, Slack Agent, or Calendar Agent.\nHandling Multiple Channel Creation (Slack): If the user's request asks to create multiple Slack channels within a single query (e.g., \"create channels marketing, sales, and support\"), you must extract all channel names and formulate a single, consolidated command for the Slack Agent. The Slack Agent is expected to handle this single command to create all specified channels. The command should be in a format like: \"create channels: [channel_name_1], [channel_name_2], [channel_name_3]\". Remember that the Slack Agent will apply its own formatting rules (lowercase, hyphens instead of spaces, no special characters) and invite 'seedx' for each channel it creates.\nNo Tool Match / General Query Handling: If, after analyzing the user's message and considering multi-step possibilities, you cannot definitively identify a task for any of your specialized agents, you should respond directly to the user as a normal language model. This means answering general queries, generating creative content, or providing information that doesn't require interaction with any of the defined tools. Do not simply pass the message to a random agent.\nClarity over Guesswork: If there's ambiguity in the user's request that could lead to incorrect agent invocation or sequencing, ask clarifying questions before calling any tool.\nAgent Communication: Pass the exact natural language command/query to the relevant specialized agent as expected by that agent. Do not attempt to reformat or interpret the command for the specialized agent, beyond what is necessary to determine which agent(s) to call and in what sequence.\n\nExamples of Orchestration Flow\nExample 1: Multi-step request (Slack to Asana)\nUser Input (from Slack): \"Can you take the conversation from the channel #test1, make a summary, and also create an Asana project with tasks based on the key points?\"\nOrchestrator Action:\n\nStep 1 (Slack Agent): Identify \"conversation from channel #test1\" and \"make a summary.\" Route get messages from #test1 and summarize to the Slack Agent.\nStep 2 (Orchestrator Processing): Receive summary from Slack Agent.\nStep 3 (Asana Agent): Identify \"create an Asana project with tasks based on the key points.\" Formulate a command like create Asana project and tasks from summary: [summary content from Slack Agent]. Route this to the Asana Agent.\nStep 4 (Orchestrator Response): Acknowledge completion of both tasks.\nExample 2: Incoming Email to Asana (Email-to-Command Conversion)\nUser Input (from Gmail Trigger): (JSON containing email content: \"Subject: New task for marketing team. Body: Please create a task in Asana for 'Social Media Campaign setup' due next Friday.\")\nOrchestrator Action:\n\nStep 1 (Mail Agent - Conversion): Identify \"Gmail\" source. Route the entire email JSON to Mail Agent.\nStep 2 (Mail Agent Output - hypothetical): \"create task 'Social Media Campaign setup' in Asana due next Friday.\"\nStep 3 (Asana Agent): Receive output from Mail Agent. Identify \"create task,\" \"Asana.\" Route create task 'Social Media Campaign setup' in Asana due next Friday to the Asana Agent.\nExample 3: Standard Asana Request\nUser Input (from Telegram/Slack): \"Please create a new project in Asana called 'Website Redesign' and add a task 'Design Homepage'.\"\nOrchestrator Action: Identify \"project,\" \"create,\" \"task,\" \"Asana.\" Route the entire message to Asana Agent.\n\nExample 4: Standard Slack Channel Creation (Multiple)\nUser Input (from Slack): \"Can you create Slack channels for 'New Product Launch', 'Marketing Campaign', and 'Sales Reports'?\"\nOrchestrator Action: Identify \"create Slack channels\" and multiple names. Formulate the single command: create channels: New Product Launch, Marketing Campaign, Sales Reports. Route this consolidated command to Slack Agent.\n\nExample 5: Standard Calendar Request\nUser Input (from Slack): \"Schedule a meeting with the design team tomorrow at 2 PM.\"\nOrchestrator Action: Identify \"schedule,\" \"meeting.\" Route schedule a meeting with the design team tomorrow at 2 PM to Calendar Agent.\n\nExample 6: Email Retrieval and Subsequent Asana Creation (New Multi-step Flow)\nUser Input (from Telegram/Slack): \"Get the most important emails that can relate to a profit making money project. Choose that one and then create an Asana project with tasks regarding that email.\"\nOrchestrator Action:\n\nStep 1 (Mail Agent - Retrieval): Identify \"Get the most important emails\" and \"profit making money project.\" Route Get the most important emails that can relate to a profit making money project to the Mail Agent.\nStep 2 (Orchestrator Processing): Receive the retrieved email content (or a summary/ID of the chosen email) from the Mail Agent. [Assumes Mail Agent successfully identified and selected one email based on criteria.]\nStep 3 (Asana Agent): Identify \"create an Asana project with tasks regarding that email.\" Formulate a command like create Asana project and tasks from email content: [content of the chosen email from Mail Agent]. Route this to the Asana Agent.\nStep 4 (Orchestrator Response): Acknowledge completion of both tasks.\nExample 7: Standard Email Retrieval\nUser Input (from Slack): \"List my 3 latest unread emails.\"\nOrchestrator Action: Identify \"List\", \"3 latest unread emails.\" Route List my 3 latest unread emails to the Mail Agent.\n\nExample 8: No Tool Match\nUser Input (from Telegram): \"What's the weather like today?\"\nOrchestrator Action: No matching keywords for Asana, Mail (not email or email-related query), Slack, or Calendar. Respond: \"The weather in Buenos Aires, Argentina today is 15°C and partly cloudy. There's a slight chance of rain later this evening.\" (Example of a general LLM response)",
+            "maxIterations": 10,
+            "returnIntermediateSteps": false,
+            "passthroughBinaryImages": true,
+            "batching": {
+              "batchSize": 1,
+              "delayBetweenBatches": 0
+            }
+          }
+        },
+        "name": "Orchestator agent",
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "position": [
+          -1120,
+          240
+        ],
+        "id": "3cc6e8f9-3789-4cf0-9637-d495ee4d8580",
+        "typeVersion": 2
+      },
+      {
+        "parameters": {
+          "trigger": [
+            "any_event"
+          ],
+          "channelId": {
+            "__rl": true,
+            "value": "C0922ATN8N7",
+            "mode": "list",
+            "cachedResultName": "n8nbot"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.slackTrigger",
+        "typeVersion": 1,
+        "position": [
+          -1740,
+          660
+        ],
+        "id": "b9c6edc9-9bd4-4207-a995-9cc64feb1db9",
+        "name": "Slack Trigger",
+        "webhookId": "9a9e5a0c-0864-4f94-96b1-9a68c763985b",
+        "credentials": {
+          "slackApi": {
+            "id": "qd7Ckp9lS0dnpERh",
+            "name": "Slack API BOT "
+          }
+        }
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "HmyrC76vQPpvllUA",
+            "mode": "list",
+            "cachedResultName": "MasterRose — RespondTo"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {},
+            "matchingColumns": [],
+            "schema": [],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": true
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.2,
+        "position": [
+          -60,
+          240
+        ],
+        "id": "8f5a9333-b754-4488-b7d3-fc137603e306",
+        "name": "RespondTo"
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "xhYD9y6l9YHxOToD",
+            "mode": "list",
+            "cachedResultName": "MasterRose — Slack_Agent"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {},
+            "matchingColumns": [],
+            "schema": [],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+        "typeVersion": 2.2,
+        "position": [
+          -880,
+          480
+        ],
+        "id": "473f5b26-d9d4-49f1-b142-07f8c6c4a113",
+        "name": "Slack Agent"
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "TIvoAJx8y5FSuiM8",
+            "mode": "list",
+            "cachedResultName": "MasterRose — Asana Agent"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {},
+            "matchingColumns": [],
+            "schema": [],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+        "typeVersion": 2.2,
+        "position": [
+          -1000,
+          480
+        ],
+        "id": "a202c572-397c-428f-9e8f-3032ca4482d8",
+        "name": "Asana"
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "MYcqMGlehcM3c21a",
+            "mode": "list",
+            "cachedResultName": "MasterRose — Calendar Agent final"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {},
+            "matchingColumns": [],
+            "schema": [],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+        "typeVersion": 2.2,
+        "position": [
+          -760,
+          480
+        ],
+        "id": "71b48daa-e72b-4b0c-ab4b-403da5942997",
+        "name": "Calendar agent",
+        "alwaysOutputData": true,
+        "retryOnFail": false
+      },
+      {
+        "parameters": {
+          "resource": "file",
+          "fileId": "={{ $json.message.voice.file_id }}"
+        },
+        "id": "f60ac852-521c-4899-be7b-cda6b752c46b",
+        "name": "Get audio file",
+        "type": "n8n-nodes-base.telegram",
+        "position": [
+          -2720,
+          440
+        ],
+        "webhookId": "73d0d328-d75b-4bb0-a1b9-81d42a2f2bfd",
+        "typeVersion": 1.2,
+        "credentials": {
+          "telegramApi": {
+            "id": "PZuX4eznX54xuez7",
+            "name": "JPBot"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "audio",
+          "operation": "translate",
+          "options": {}
+        },
+        "id": "0c6327fe-588b-49da-9301-1efab87581de",
+        "name": "Transcribe audio",
+        "type": "@n8n/n8n-nodes-langchain.openAi",
+        "position": [
+          -2540,
+          440
+        ],
+        "typeVersion": 1.8,
+        "credentials": {
+          "openAiApi": {
+            "id": "ViugSw2fy0bWv5p8",
+            "name": "OpenAi account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "version": 2,
+                    "leftValue": "",
+                    "caseSensitive": true,
+                    "typeValidation": "strict"
+                  },
+                  "combinator": "and",
+                  "conditions": [
+                    {
+                      "id": "a561aab7-4c3b-4c96-9bb7-078281b5c7d5",
+                      "operator": {
+                        "type": "string",
+                        "operation": "exists",
+                        "singleValue": true
+                      },
+                      "leftValue": "={{ $json.message.text }}",
+                      "rightValue": ""
+                    }
+                  ]
+                },
+                "renameOutput": true,
+                "outputKey": "text"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "version": 2,
+                    "leftValue": "",
+                    "caseSensitive": true,
+                    "typeValidation": "strict"
+                  },
+                  "combinator": "and",
+                  "conditions": [
+                    {
+                      "id": "b7f1055d-6651-416f-b0cd-c46e003d4f3a",
+                      "operator": {
+                        "type": "object",
+                        "operation": "exists",
+                        "singleValue": true
+                      },
+                      "leftValue": "={{ $json.message.voice }}",
+                      "rightValue": ""
+                    }
+                  ]
+                },
+                "renameOutput": true,
+                "outputKey": "voice"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "cbccd40e-e18e-4cf1-b01c-bd75e9e27db0",
+        "name": "Route Chat Input",
+        "type": "n8n-nodes-base.switch",
+        "position": [
+          -2860,
+          260
+        ],
+        "typeVersion": 3.2
+      },
+      {
+        "parameters": {
+          "updates": [
+            "*"
+          ],
+          "additionalFields": {}
+        },
+        "id": "109bf1a4-fcc9-4960-8f89-464a113a6ea1",
+        "name": "Telegram Trigger1",
+        "type": "n8n-nodes-base.telegramTrigger",
+        "position": [
+          -3040,
+          260
+        ],
+        "webhookId": "c537cfcc-6c4a-436a-8871-d32f8ce016cb",
+        "typeVersion": 1,
+        "credentials": {
+          "telegramApi": {
+            "id": "PZuX4eznX54xuez7",
+            "name": "JPBot"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Telegram Trigger1').item.json.message.chat.id }}",
+          "text": "=Translate : {{ $json.text }}",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "id": "630dd4bb-acfb-4ed7-a11e-5a37d5585143",
+        "name": "Send transcription message",
+        "type": "n8n-nodes-base.telegram",
+        "position": [
+          -2320,
+          440
+        ],
+        "webhookId": "5c6997c0-948a-49bb-a542-10c8bf130fdd",
+        "typeVersion": 1.2,
+        "credentials": {
+          "telegramApi": {
+            "id": "PZuX4eznX54xuez7",
+            "name": "JPBot"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "75bb444d-b63b-4141-8b12-9e409f92f74a",
+                "name": "mensajeTranscribe",
+                "value": "={{ $('Transcribe audio').item.json.text }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          -2040,
+          440
+        ],
+        "id": "17e717a9-11f3-4dda-b696-27ae076e85b0",
+        "name": "MapMessage"
+      }
+    ],
+    "connections": {
+      "When chat message received": {
+        "main": [
+          [
+            {
+              "node": "normalize_chatmessage",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "normalize_chatmessage": {
+        "main": [
+          [
+            {
+              "node": "Orchestator agent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Gmail Trigger": {
+        "main": [
+          [
+            {
+              "node": "normalize_chatmessage",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Google Gemini Chat Model1": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Orchestator agent",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Mail Agent": {
+        "ai_tool": [
+          [
+            {
+              "node": "Orchestator agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "VariablesMensaje": {
+        "main": [
+          [
+            {
+              "node": "RespondTo",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Orchestator agent": {
+        "main": [
+          [
+            {
+              "node": "VariablesMensaje",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Slack Trigger": {
+        "main": [
+          [
+            {
+              "node": "normalize_chatmessage",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Slack Agent": {
+        "ai_tool": [
+          [
+            {
+              "node": "Orchestator agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Asana": {
+        "ai_tool": [
+          [
+            {
+              "node": "Orchestator agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Calendar agent": {
+        "ai_tool": [
+          [
+            {
+              "node": "Orchestator agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get audio file": {
+        "main": [
+          [
+            {
+              "node": "Transcribe audio",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Transcribe audio": {
+        "main": [
+          [
+            {
+              "node": "Send transcription message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Route Chat Input": {
+        "main": [
+          [
+            {
+              "node": "normalize_chatmessage",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Get audio file",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Telegram Trigger1": {
+        "main": [
+          [
+            {
+              "node": "Route Chat Input",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Send transcription message": {
+        "main": [
+          [
+            {
+              "node": "MapMessage",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "MapMessage": {
+        "main": [
+          [
+            {
+              "node": "normalize_chatmessage",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "pinData": {},
+    "meta": {
+      "templateCredsSetupCompleted": true,
+      "instanceId": "919e96d1e977fb9355092c3c317df2deed08af20cde05c8987b8216daea6fe6b"
+    }
+  }

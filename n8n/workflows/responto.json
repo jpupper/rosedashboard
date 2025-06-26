@@ -1,0 +1,301 @@
+{
+    "nodes": [
+      {
+        "parameters": {
+          "chatId": "={{ $('When Executed by Another Workflow').item.json.idtelegram }}",
+          "text": "={{ $('When Executed by Another Workflow').item.json.mensaje }}",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          -180,
+          -240
+        ],
+        "id": "ccff85a0-f8c7-478c-a5eb-3ea734631431",
+        "name": "Telegram",
+        "webhookId": "bf06f3bc-cdb1-451b-bc88-4ca21a69854f",
+        "credentials": {
+          "telegramApi": {
+            "id": "PZuX4eznX54xuez7",
+            "name": "JPBot"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "loose",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.datasource }}",
+                      "rightValue": 0,
+                      "operator": {
+                        "type": "number",
+                        "operation": "equals"
+                      },
+                      "id": "fbe04bac-1568-43ed-95f3-02171e12d89a"
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "0"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "loose",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "id": "c403cd6a-b72e-409d-89fe-79fd89b66b6a",
+                      "leftValue": "={{ $json.datasource }}",
+                      "rightValue": 2,
+                      "operator": {
+                        "type": "number",
+                        "operation": "equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "2"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "loose",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "id": "8b09e1d5-4316-4a09-b3cb-2694145df371",
+                      "leftValue": "={{ $json.datasource }}",
+                      "rightValue": "4",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "4"
+              }
+            ]
+          },
+          "looseTypeValidation": true,
+          "options": {}
+        },
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3.2,
+        "position": [
+          -520,
+          -60
+        ],
+        "id": "1bf5c454-c1c2-437d-84af-8fa655eaed36",
+        "name": "Switch3"
+      },
+      {
+        "parameters": {
+          "inputSource": "passthrough"
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          -800,
+          -60
+        ],
+        "id": "9b0c401f-cf15-4ec1-a992-4d79634d9b89",
+        "name": "When Executed by Another Workflow"
+      },
+      {
+        "parameters": {
+          "select": "channel",
+          "channelId": {
+            "__rl": true,
+            "value": "C0922ATN8N7",
+            "mode": "list",
+            "cachedResultName": "n8nbot"
+          },
+          "text": "={{ $json.mensaje }}",
+          "otherOptions": {
+            "includeLinkToWorkflow": false
+          }
+        },
+        "type": "n8n-nodes-base.slack",
+        "typeVersion": 2.3,
+        "position": [
+          -180,
+          -20
+        ],
+        "id": "4433be21-1a50-4384-96e0-254833adc0d1",
+        "name": "messageToSlack",
+        "webhookId": "80509811-f5bb-4f78-907f-88eebadd4ce8",
+        "credentials": {
+          "slackApi": {
+            "id": "qd7Ckp9lS0dnpERh",
+            "name": "Slack API BOT "
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "audio",
+          "input": "={{ $json.output }}",
+          "options": {
+            "response_format": "opus"
+          }
+        },
+        "id": "1c4dca97-4b3f-4c9b-9e79-b2b6f5866ce8",
+        "name": "Transcribe audio1",
+        "type": "@n8n/n8n-nodes-langchain.openAi",
+        "position": [
+          100,
+          200
+        ],
+        "typeVersion": 1.8,
+        "credentials": {
+          "openAiApi": {
+            "id": "ViugSw2fy0bWv5p8",
+            "name": "OpenAi account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "sendAudio",
+          "chatId": "={{ $('When Executed by Another Workflow').item.json.idtelegram }}",
+          "binaryData": true,
+          "additionalFields": {}
+        },
+        "id": "fb89073c-c920-416f-a787-0e14e49b4728",
+        "name": "Send transcription message1",
+        "type": "n8n-nodes-base.telegram",
+        "position": [
+          340,
+          200
+        ],
+        "webhookId": "5c6997c0-948a-49bb-a542-10c8bf130fdd",
+        "typeVersion": 1.2,
+        "credentials": {
+          "telegramApi": {
+            "id": "PZuX4eznX54xuez7",
+            "name": "JPBot"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "ce89af1e-28c2-4d94-8120-f71a73e0329f",
+                "name": "output",
+                "value": "={{ $json.mensaje }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          -180,
+          200
+        ],
+        "id": "ef26f61e-e933-416a-91db-cc2cc526ed28",
+        "name": "Edit Fields"
+      }
+    ],
+    "connections": {
+      "Telegram": {
+        "main": [
+          []
+        ]
+      },
+      "Switch3": {
+        "main": [
+          [
+            {
+              "node": "Telegram",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "messageToSlack",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Edit Fields",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "Switch3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Transcribe audio1": {
+        "main": [
+          [
+            {
+              "node": "Send transcription message1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields": {
+        "main": [
+          [
+            {
+              "node": "Transcribe audio1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "pinData": {},
+    "meta": {
+      "templateCredsSetupCompleted": true,
+      "instanceId": "919e96d1e977fb9355092c3c317df2deed08af20cde05c8987b8216daea6fe6b"
+    }
+  }
