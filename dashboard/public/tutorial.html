@@ -7,10 +7,13 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="css/styles.css" rel="stylesheet">
     <link href="css/branding.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         /* Font styling */
         h1, h2, h3, h4, h5, h6 {
-            font-family: 'Optician', sans-serif;
+            font-family: 'Roboto', 'Arial', sans-serif;
+            font-weight: 500;
+            letter-spacing: 0.5px;
         }
         
         body, p, li, ul, ol, div {
@@ -34,7 +37,7 @@
         .agent-title {
             font-weight: bold;
             margin-bottom: 0.5rem;
-            font-family: 'Optician', sans-serif;
+            font-family: 'Roboto', 'Arial', sans-serif;
         }
         
         .workflow-diagram {
@@ -64,17 +67,12 @@
         
         .tutorial-nav .navbar-brand {
             color: var(--secondary-color);
-            font-family: 'Optician', sans-serif;
+            font-family: 'Roboto', 'Arial', sans-serif;
+            font-weight: 500;
         }
     </style>
 </head>
 <body>
-    <!-- Custom navigation for tutorial page -->
-    <nav class="navbar navbar-expand-lg navbar-dark tutorial-nav">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="index.html">Rose Dashboard</a>
-        </div>
-    </nav>
 
     <div class="container mt-4">
         <div class="row">
@@ -85,23 +83,28 @@
                         
                         <div class="tutorial-section">
                             <h3>System Overview</h3>
-                            <p>The Rose n8n Agent System is an intelligent workflow automation platform that uses a network of specialized AI agents to handle various tasks across different services. The system is designed with a central orchestrator agent that routes requests to specialized subagents based on the task requirements.</p>
+                            <p>Rose is an AI-powered workflow automation system built on n8n that connects Slack, Asana, Gmail, and Google Calendar through specialized agents. The system uses an Orchestrator Agent at its core that communicates with specialized agents (Calendar, Slack, Asana, and Mail) to process your requests. The system is extensible - new workflows can be added to enhance capabilities.</p>
                             
                             <div class="key-feature">
                                 <h4>Key Features</h4>
                                 <ul>
-                                    <li>Multi-agent architecture with specialized agents for different services</li>
-                                    <li>Intelligent task routing and sequencing</li>
-                                    <li>Bidirectional communication between agents</li>
-                                    <li>Natural language processing of user requests</li>
-                                    <li>Integration with Slack, Asana, Gmail, and Google Calendar</li>
+                                    <li>Multiple input sources: Slack, Telegram chatbot, or email</li>
+                                    <li>Voice input and output support via Telegram (speak to Rose and get audio responses)</li>
+                                    <li>Convert emails to Asana tasks automatically</li>
+                                    <li>Create calendar events from conversations</li>
+                                    <li>Summarize channel messages and convert to actionable tasks</li>
                                 </ul>
+                            </div>
+                            
+                            <div class="workflow-image mt-4">
+                                <h4>n8n Workflow Example</h4>
+                                <img src="n8n/n8nworkflow.png" alt="n8n Workflow Diagram" class="img-fluid border rounded">
                             </div>
                         </div>
                         
                         <div class="tutorial-section">
-                            <h3>Agent Architecture</h3>
-                            <p>The system uses a hub-and-spoke architecture with the Orchestrator Agent at the center:</p>
+                            <h3>How It Works</h3>
+                            <p>Rose uses these specialized agents to handle your requests:</p>
                             
                             <div class="row">
                                 <div class="col-md-6">
@@ -142,99 +145,111 @@
                         </div>
                         
                         <div class="tutorial-section">
-                            <h3>How the System Works</h3>
+                            <h3>Quick Start Commands</h3>
                             
-                            <h4>Request Flow</h4>
-                            <ol>
-                                <li><strong>Input Reception:</strong> System receives user input from Slack, Gmail, or Telegram</li>
-                                <li><strong>Intent Recognition:</strong> Orchestrator analyzes the request to identify necessary agent(s)</li>
-                                <li><strong>Task Routing:</strong> Request is sent to the appropriate specialized agent</li>
-                                <li><strong>Task Execution:</strong> Specialized agent performs the required action</li>
-                                <li><strong>Response Generation:</strong> Results are formatted and returned to the user</li>
-                            </ol>
+                            <h4>Input Methods</h4>
+                            <ul>
+                                <li><strong>Slack:</strong> Type commands directly in any channel where Rose is added</li>
+                                <li><strong>Telegram:</strong> Send text or voice messages to the Rose chatbot</li>
+                                <li><strong>Email:</strong> Send emails that trigger automated workflows</li>
+                            </ul>
                             
-                            <h4>Multi-Step Operations</h4>
-                            <p>For complex requests requiring multiple agents, the Orchestrator sequences operations logically:</p>
-                            <ol>
-                                <li>Analyze request to identify all necessary subtasks</li>
-                                <li>Determine optimal sequence of operations</li>
-                                <li>Execute each step sequentially, passing outputs from one agent as inputs to the next</li>
-                                <li>Combine results into a coherent response</li>
-                            </ol>
+                            <h4>Slack Commands</h4>
+                            <ul>
+                                <li><code>Create channel #project-name</code> - Creates a new Slack channel</li>
+                                <li><code>Get messages from #channel-name</code> - Retrieves recent messages</li>
+                                <li><code>Send message to #channel-name: your message</code> - Posts a message</li>
+                            </ul>
+                            
+                            <h4>Asana Commands</h4>
+                            <ul>
+                                <li><code>Create project called Project Name</code> - Creates a new Asana project</li>
+                                <li><code>Add task Title with description Details to Project Name</code> - Creates a task</li>
+                                <li><code>List all tasks in Project Name</code> - Shows all tasks in a project</li>
+                            </ul>
+                            
+                            <h4>Email Commands</h4>
+                            <ul>
+                                <li><code>Get emails from sender@example.com</code> - Retrieves emails from sender</li>
+                                <li><code>Summarize emails about "Topic"</code> - Summarizes relevant emails</li>
+                            </ul>
+                            
+                            <h4>Calendar Commands</h4>
+                            <ul>
+                                <li><code>Schedule meeting "Title" on June 30 at 2pm</code> - Creates calendar event</li>
+                                <li><code>Show my meetings for tomorrow</code> - Lists upcoming events</li>
+                            </ul>
                         </div>
                         
                         <div class="tutorial-section">
-                            <h3>Example Scenarios</h3>
+                            <h3>Example Workflows</h3>
                             
                             <div class="key-feature">
-                                <h4>Scenario 1: Email to Asana Project Conversion</h4>
-                                <p><strong>User Input:</strong> An email is received via Gmail trigger</p>
-                                <p><strong>Process:</strong></p>
-                                <ol>
-                                    <li>Orchestrator identifies email source and routes to Mail Agent</li>
-                                    <li>Mail Agent converts email content into Asana command</li>
-                                    <li>Orchestrator takes Mail Agent output and routes to Asana Agent</li>
-                                    <li>Asana Agent creates project/tasks based on email content</li>
-                                    <li>User receives confirmation of created project/tasks</li>
-                                </ol>
+                                <h4>Convert Email to Asana Tasks</h4>
+                                <p><strong>Command:</strong> <code>Convert email from sender@example.com to Asana tasks in Project Name</code></p>
+                                <p>This automatically creates Asana tasks from email content with proper titles and descriptions.</p>
                             </div>
                             
                             <div class="key-feature">
-                                <h4>Scenario 2: Slack Conversation to Asana Tasks</h4>
-                                <p><strong>User Input:</strong> "Get messages from #project-planning, summarize them and create an Asana project with tasks"</p>
-                                <p><strong>Process:</strong></p>
-                                <ol>
-                                    <li>Orchestrator recognizes multi-step request involving Slack and Asana</li>
-                                    <li>Slack Agent retrieves and summarizes channel messages</li>
-                                    <li>Orchestrator passes summary to Asana Agent</li>
-                                    <li>Asana Agent creates project with tasks based on summary</li>
-                                    <li>User receives confirmation with project details</li>
-                                </ol>
+                                <h4>Slack to Asana Workflow</h4>
+                                <p><strong>Command:</strong> <code>Get messages from #project-planning, summarize them and create an Asana project with tasks</code></p>
+                                <p>This captures Slack discussions and converts them into actionable Asana tasks.</p>
+                            </div>
+                            
+                            <div class="key-feature">
+                                <h4>Calendar Management</h4>
+                                <p><strong>Command:</strong> <code>Schedule meeting with team about project launch on Friday at 2pm for 1 hour</code></p>
+                                <p>This creates a calendar event with all specified details.</p>
                             </div>
                         </div>
                         
                         <div class="tutorial-section">
-                            <h3>Usage Tips</h3>
+                            <h3>Pro Tips</h3>
                             <ul>
-                                <li><strong>Be specific in requests:</strong> Include clear action verbs and target platforms</li>
-                                <li><strong>Use platform-specific keywords:</strong> Include terms like "project," "task," "channel," "email," or "meeting"</li>
-                                <li><strong>For multi-step operations:</strong> Clearly outline the sequence you want ("First get X, then create Y")</li>
-                                <li><strong>For Slack operations:</strong> Always reference channels by name with the # prefix</li>
-                                <li><strong>For Asana operations:</strong> Be specific about project and task names</li>
+                                <li><strong>Use action verbs:</strong> Start commands with create, get, schedule, send, or list</li>
+                                <li><strong>Reference channels with #:</strong> Always use # before Slack channel names</li>
+                                <li><strong>Be specific with names:</strong> Use exact project, task, and event names</li>
+                                <li><strong>For complex tasks:</strong> Use "then" to chain commands ("Get emails then create tasks")</li>
+                                <li><strong>Voice commands:</strong> Speak naturally to Telegram for audio responses</li>
                             </ul>
                         </div>
                         
                         <div class="tutorial-section">
-                            <h3>System Capabilities</h3>
+                            <h3>Quick Reference</h3>
                             
-                            <h4>Email Management</h4>
-                            <ul>
-                                <li>Retrieve, filter, count, and summarize emails</li>
-                                <li>Convert email content into Asana tasks/projects</li>
-                                <li>Search emails by sender, subject, or content</li>
-                            </ul>
-                            
-                            <h4>Slack Management</h4>
-                            <ul>
-                                <li>Create, archive, and unarchive channels</li>
-                                <li>Add/invite users to channels</li>
-                                <li>Retrieve and summarize channel messages</li>
-                                <li>Send messages to channels or users</li>
-                            </ul>
-                            
-                            <h4>Asana Management</h4>
-                            <ul>
-                                <li>Create, modify, and delete projects</li>
-                                <li>Add, update, and remove tasks</li>
-                                <li>List all projects and tasks</li>
-                            </ul>
-                            
-                            <h4>Calendar Management</h4>
-                            <ul>
-                                <li>Create and schedule meetings and events</li>
-                                <li>Search and retrieve calendar events</li>
-                                <li>Update and delete events</li>
-                            </ul>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h4>Email</h4>
+                                    <ul>
+                                        <li><code>Get emails from [sender]</code></li>
+                                        <li><code>Find emails about "[topic]"</code></li>
+                                        <li><code>Summarize recent emails</code></li>
+                                    </ul>
+                                    
+                                    <h4>Slack</h4>
+                                    <ul>
+                                        <li><code>Create channel #[name]</code></li>
+                                        <li><code>Send message to #[channel]</code></li>
+                                        <li><code>Get messages from #[channel]</code></li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <h4>Asana</h4>
+                                    <ul>
+                                        <li><code>Create project [name]</code></li>
+                                        <li><code>Add task [title] to [project]</code></li>
+                                        <li><code>List tasks in [project]</code></li>
+                                    </ul>
+                                    
+                                    <h4>Calendar</h4>
+                                    <ul>
+                                        <li><code>Schedule meeting "[title]" on [date]</code></li>
+                                        <li><code>Show events for [date]</code></li>
+                                        <li><code>Update meeting "[title]"</code></li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
