@@ -3,6 +3,8 @@ body {
     font-family: 'Roboto', sans-serif;
     color: #000;
     background-color: #fff;
+    overflow-x: hidden; /* Prevent horizontal scroll */
+    line-height: 1.5;
 }
 
 /* Typography */
@@ -14,42 +16,54 @@ h1, h2, h3, h4, h5, h6 {
 /* Logo and Header */
 .seed-logo-container {
     text-align: center;
-    padding: 6rem 0;
-    margin-bottom: 4rem;
+    padding: 3rem 1rem;
+    margin-bottom: 2rem;
     position: relative;
     background: #fff;
     border-bottom: 1px solid #000;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .seed-logo {
-    width: 400px;
+    max-width: 100%;
     height: auto;
-    margin-bottom: 2.5rem;
+    margin: 0 auto 1.5rem;
+    display: block;
+    padding: 0 1rem;
+    box-sizing: border-box;
 }
 
 .main-title {
-    font-size: 2.5rem;
+    font-size: 1.8rem;
     font-weight: 500;
     color: #000;
     margin: 0;
     opacity: 0.9;
+    padding: 0 1rem;
+    word-wrap: break-word;
 }
 
 /* Card Styles */
 .card {
     border: 2px solid #000;
-    border-radius: 15px;
-    margin-bottom: 2rem;
+    border-radius: 10px;
+    margin: 1rem 0;
     background: #fff;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 .card-title {
     color: #000;
-    font-size: 2rem;
-    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
+    margin: 0 0 1.5rem 0;
     border-bottom: 2px solid #000;
     padding-bottom: 0.5rem;
-    display: inline-block;
+    display: block;
+    width: 100%;
+    word-wrap: break-word;
 }
 
 /* Tutorial Sections */
@@ -65,19 +79,22 @@ h1, h2, h3, h4, h5, h6 {
 .agent-list {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
-    padding: 1rem;
+    gap: 0rem;
+    /* padding: 0; */
 }
 
 .agent-item {
     border: 2px solid #000;
-    border-radius: 12px;
-    padding: 2rem;
+    border-radius: 10px;
+    padding: 0.5rem;
     display: flex;
+    flex-direction: column;
     align-items: flex-start;
-    gap: 1.5rem;
+    gap: 1rem;
     margin-bottom: 1.5rem;
     background: #fff;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .agent-icon {
@@ -131,20 +148,54 @@ code {
 }
 
 /* Responsive Adjustments */
+/* Mobile First Approach */
 @media (max-width: 768px) {
-    .seed-logo {
-        width: 300px;
+    .container {
+        padding: 0 1rem;
     }
     
-    .main-title {
-        font-size: 2rem;
+    .tutorial-section {
+        padding: 1rem;
+        margin: 0.5rem 0;
     }
     
     .card-title {
         font-size: 1.5rem;
+        line-height: 1.3;
     }
     
-    .tutorial-section {
-        padding: 1.2rem;
+    h3 {
+        font-size: 1.3rem;
+    }
+    
+    h4 {
+        font-size: 1.1rem;
+    }
+    
+    .agent-icon {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .key-feature {
+        padding: 0.8rem;
+    }
+    
+    ul, ol {
+        padding-left: 1.2rem;
+    }
+    
+    code {
+        word-break: break-word;
+        white-space: pre-wrap;
+    }
+    
+    .workflow-image {
+        margin: 1rem 0;
+    }
+    
+    .workflow-image img {
+        width: 100%;
+        height: auto;
     }
 }
