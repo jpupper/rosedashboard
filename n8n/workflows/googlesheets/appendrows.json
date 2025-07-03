@@ -1,0 +1,58 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://sheets.googleapis.com/v4/spreadsheets/{{ $json.spreadsheetId }}/values/{{ $json.sheetName }}:append",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleSheetsOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "valueInputOption",
+              "value": "RAW"
+            },
+            {
+              "name": "insertDataOption",
+              "value": "INSERT_ROWS"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "values",
+              "value": "={{$json.rows.map(row => $json.columns.map(col => row[col]))}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1b316e79-0461-4655-a6fc-a1a42451559b",
+      "name": "Append Rows to Sheet",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -20,
+        -80
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "aLsAcN799ePPGzAI",
+          "name": "seedx sheets"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Append Rows to Sheet": {
+      "main": [[]]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "919e96d1e977fb9355092c3c317df2deed08af20cde05c8987b8216daea6fe6b"
+  }
+}

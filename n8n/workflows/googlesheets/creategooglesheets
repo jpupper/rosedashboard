@@ -1,0 +1,227 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -100,
+        80
+      ],
+      "id": "297865ef-26ee-4cf7-b355-1f479faa90cf",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "headers",
+              "value": "={{ $('FormatData').item.json.columns }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "58b35c0c-98ab-4cc6-b77b-5434229720b7",
+      "name": "Define headers1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        420,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "boolean": [
+            {
+              "name": "success",
+              "value": true
+            }
+          ],
+          "string": [
+            {
+              "name": "message",
+              "value": "=The sheets{{ $('FormatData').item.json.filename }} has been created . \\n List of colums created {{ $('FormatData').item.json.columns }}. The id of the create sheet is {{ $('Google Sheets').item.json.spreadsheetId }}"
+            }
+          ],
+          "number": [
+            {
+              "name": "statusCode",
+              "value": 201
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        760,
+        80
+      ],
+      "id": "d6c8ed22-3376-4b13-a864-66c804bff813",
+      "name": "Set Response",
+      "alwaysOutputData": true,
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const result = [];\n\nfor (const item of $input.all()) {\n  try {\n    // Obtener el string JSON de la propiedad query\n    const jsonString = item.json.query;\n    \n    // Parsear el string JSON a objeto JavaScript\n    const parsedJson = JSON.parse(jsonString);\n    \n    // Si el parsedJson es un array, agregamos todos sus elementos\n    if (Array.isArray(parsedJson)) {\n      result.push(...parsedJson);\n    } else {\n      // Si es un objeto individual, lo agregamos directamente\n      result.push(parsedJson);\n    }\n    \n  } catch (error) {\n    // En caso de error, devolver el error dentro de la estructura requerida\n    result.push({\n      error: \"Failed to parse JSON\",\n      message: error.message,\n      originalInput: item.json\n    });\n  }\n}\n\nreturn result;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        100,
+        80
+      ],
+      "id": "dcc053c4-c956-49a9-95d7-3bc2e315eb7a",
+      "name": "FormatData"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://sheets.googleapis.com/v4/spreadsheets/{{ $json.spreadsheetId }}/values/Main!A:Z",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleSheetsOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "valueInputOption",
+              "value": "RAW"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "range",
+              "value": "Main!A:Z"
+            },
+            {
+              "name": "values",
+              "value": "={{ [$json.headers] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6b66b88c-e52a-49c2-9e4a-9e1c4dcb5fd6",
+      "name": "Update Google Sheet",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        600,
+        80
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "aLsAcN799ePPGzAI",
+          "name": "seedx sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "spreadsheet",
+        "title": "={{ $json.filename }}",
+        "sheetsUi": {
+          "sheetValues": [
+            {
+              "title": "Main"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0410f507-5f1c-4364-bd11-44715499a6c3",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        260,
+        80
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "aLsAcN799ePPGzAI",
+          "name": "seedx sheets"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "FormatData",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Define headers1": {
+      "main": [
+        [
+          {
+            "node": "Update Google Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FormatData": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Google Sheet": {
+      "main": [
+        [
+          {
+            "node": "Set Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Define headers1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "query": "[{\"id\": \"1WZMvhJgCAqvaWdh4l4OHjd_7S5hKRu9MbwujiTzglsQ\", \"filename\": \"clientdata\", \"columns\": [\"ffffff\", \"eeeee\", \"eeeee\", \"eeeee\"]}]"
+      }
+    ]
+  },
+  "meta": {
+    "instanceId": "919e96d1e977fb9355092c3c317df2deed08af20cde05c8987b8216daea6fe6b"
+  }
+}

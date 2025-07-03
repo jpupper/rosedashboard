@@ -1,0 +1,436 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        20,
+        0
+      ],
+      "id": "b77c9be7-d381-4272-9db2-0486b6a5a739",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -340,
+        300
+      ],
+      "id": "be23587a-9bbe-4fde-9f2c-72a2d1221c85",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "qgvevjryXSratZ8f",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json }}",
+        "options": {
+          "systemMessage": "# Google Sheets Agent (Version 1.1)\n\n## OVERVIEW\nYou are the Google Sheets Agent responsible for processing natural language requests related to Google Sheets operations.\n\n### ⚠️ CRITICAL RULES ⚠️\n1. ALWAYS use the Search Tool FIRST to get spreadsheet ID before any operation\n2. Use clear, concise responses focused on the task result\n3. Handle errors gracefully with clear explanations\n4. Provide feedback on all operations performed\n5. ALWAYS use \"Sheet1\" as the default sheet name if not specified by the user\n   - Every new Google Sheet starts with a sheet named \"Sheet1\"\n   - Only use other sheet names if explicitly mentioned by the user\n\n## TOOLS AND OPERATIONS\n\n### 1. Search Tool\n**Description:** Finds spreadsheet by name (not by sheet name)\n**When to Use:** MUST be used FIRST for ALL operations\n**Error Handling:** If spreadsheet not found, explain clearly\n**Important:** This tool finds the spreadsheet file, not individual sheets within it\n\n### 2. Read Operation\n**Description:** Retrieves data from specified range\n**Parameters:**\n- Range in A1 notation (e.g., \"A1:B10\" will use Sheet1 by default)\n- If user specifies a different sheet: \"SheetName!A1:B10\"\n**Output:** Data from specified range\n**Default:** Uses \"Sheet1\" if no sheet name specified\n\n### 3. Column Management Operation\n**Description:** Creates or updates column headers in a sheet\n**Parameters:**\n- JSON input with file ID, name and column list\n**Input Format:**\n```json\n[\n  {\n    \"id\": \"spreadsheet_id\",\n    \"nombre_archivo\": \"nombre_del_archivo.json\",\n    \"columnas\": [\"columna1\", \"columna2\", \"columna3\"]\n  }\n]\n```\n**Output:** Confirmation of column headers being set\n**Default:** Uses Sheet1 for new columns\n**Examples:**\n- When receiving JSON input: Uses the provided spreadsheet ID and column list directly\n- User says \"set columns Name, Age, Address\" → Sets headers in Sheet1\n- User says \"create columns First Name, Last Name in Sales sheet\" → Sets headers in Sales sheet\n\n### 4. Append/Update Operation\n**Description:** Adds or modifies data\n**Parameters:**\n- Range to modify (uses Sheet1 by default)\n- Values to add/update\n**Output:** Confirmation of changes made\n**Example:** \n- User says \"A1\" → Use \"Sheet1!A1\"\n- User says \"Sales!A1\" → Use specified sheet \"Sales\"\n\n### 5. Delete Row Operation\n**Description:** Removes specified rows\n**Parameters:**\n- Row number(s) to delete (from Sheet1 by default)\n- Sheet name (optional, defaults to Sheet1)\n**Output:** Confirmation of deletion\n**Example:**\n- User says \"delete row 5\" → Deletes from Sheet1\n- User says \"delete row 5 from Sales sheet\" → Deletes from Sales sheet\n\n## EXAMPLES\n\n### Example 1: Read Data with Default Sheet\n**User:** \"Read the first 5 rows from the Budget 2024 spreadsheet\"\n\n**Agent:** \"Let me check the Budget 2024 spreadsheet.\"\n[Uses search tool]\n\"Here are the first 5 rows from Sheet1 (default sheet):\n[Retrieved data displayed here]\"\n\n### Example 2: Update Data with Specific Sheet\n**User:** \"Update cell A1 to 'Total Sales' in the Sales sheet of Q2 Report\"\n\n**Agent:** \"Looking for the Q2 Report spreadsheet.\"\n[Uses search tool]\n\"Updated cell A1 in the Sales sheet to 'Total Sales'. The change has been applied successfully.\"\n\n### Example 3: Default Sheet Error Handling\n**User:** \"Delete row 5 from Missing Spreadsheet\"\n\n**Agent:** \"I couldn't find a spreadsheet named 'Missing Spreadsheet'. Please verify the name and try again. Remember that by default I'll use Sheet1 when you don't specify a sheet name.\"\n\n### Example 4: Using Default Sheet\n**User:** \"Write 'Revenue' in cell B1 of the Finance spreadsheet\"\n\n**Agent:** \"Looking for the Finance spreadsheet.\"\n[Uses search tool]\n\"I've written 'Revenue' in cell B1 of Sheet1 (default sheet). If you want to write to a different sheet, please specify the sheet name.\"\n\n### Example 5: Column Management\n**User:** \"Create columns Product, Quantity, Price in the Inventory sheet of the Store spreadsheet\"\n\n**Agent:** \"Looking for the Store spreadsheet.\"\n[Uses search tool]\n\"I've created columns Product, Quantity, Price in the Inventory sheet. The column headers have been set successfully.\"\n\n## CHANGELOG\n- v1.2: Added column management functionality with HTTP Request node\n- v1.1: Added Sheet1 as default sheet name and improved sheet name handling\n- v1.0: Initial implementation with streamlined operations\n",
+          "maxIterations": 20,
+          "returnIntermediateSteps": false
+        }
+      },
+      "name": "GOOGLE SPREEDSHEETS",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        240,
+        0
+      ],
+      "id": "6dc6040d-2fc7-4a73-a16c-a6b792a0459a",
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Document', ``, 'string') }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet1",
+          "mode": "name"
+        },
+        "startIndex": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start_Row_Number', ``, 'number') }}",
+        "numberToDelete": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Number_of_Rows_to_Delete', ``, 'number') }}"
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        380,
+        320
+      ],
+      "id": "7ee38190-f7e6-4f6d-b796-bd67f612288b",
+      "name": "Delete row",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "aLsAcN799ePPGzAI",
+          "name": "seedx sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Search_Query', ``, 'string') }}",
+        "returnAll": true,
+        "filter": {
+          "includeTrashed": false
+        },
+        "options": {
+          "fields": [
+            "name",
+            "id"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDriveTool",
+      "typeVersion": 3,
+      "position": [
+        -180,
+        300
+      ],
+      "id": "b7c0ccb6-5799-4ff3-a77f-c461cf9685bf",
+      "name": "Search tool",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "yGWuKCtlr1Cgm4q2",
+          "name": "Google Drive account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Document', ``, 'string') }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Sheet', ``, 'string') }}",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        500,
+        320
+      ],
+      "id": "e3964067-b9a5-493c-a8fc-a56b083a3818",
+      "name": "update",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "aLsAcN799ePPGzAI",
+          "name": "seedx sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Get row(s) in sheet in Google Sheets",
+        "documentId": {
+          "__rl": true,
+          "value": "1HP7xKhWCG-wjMpffggH35hUErgbJx2l5O32xZGicS0c",
+          "mode": "list",
+          "cachedResultName": "sarasa",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HP7xKhWCG-wjMpffggH35hUErgbJx2l5O32xZGicS0c/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 202919784,
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HP7xKhWCG-wjMpffggH35hUErgbJx2l5O32xZGicS0c/edit#gid=202919784"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        120,
+        320
+      ],
+      "id": "35760db8-e085-4a11-9ca7-8e390971d028",
+      "name": "Read",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "aLsAcN799ePPGzAI",
+          "name": "seedx sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "spreadsheet",
+        "operation": "deleteSpreadsheet",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Document', ``, 'string') }}",
+          "mode": "id"
+        }
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        640,
+        320
+      ],
+      "id": "5f56cbf7-bb0d-4d18-ac56-ed3687facad4",
+      "name": "Delete File",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "aLsAcN799ePPGzAI",
+          "name": "seedx sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Document', ``, 'string') }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Sheet', ``, 'string') }}"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Value', ``, 'string') }}",
+            "Adress": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Adress', ``, 'string') }}",
+            "Age": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Age', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Value",
+              "displayName": "Value",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Adress",
+              "displayName": "Adress",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Age",
+              "displayName": "Age",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        260,
+        320
+      ],
+      "id": "b7767901-5423-4221-b9d7-b2bf0a554194",
+      "name": "Append row",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "aLsAcN799ePPGzAI",
+          "name": "seedx sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "Call this tool to update Columns",
+        "workflowId": {
+          "__rl": true,
+          "value": "OCSEUNZAQwov99n2",
+          "mode": "list",
+          "cachedResultName": "MasterRose — updateColums_sheets"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        980,
+        280
+      ],
+      "id": "b8d1f8a5-884c-4235-9068-45a8515961f1",
+      "name": "Create Sheets",
+      "alwaysOutputData": true,
+      "onError": "continueErrorOutput"
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "GOOGLE SPREEDSHEETS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "GOOGLE SPREEDSHEETS",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GOOGLE SPREEDSHEETS": {
+      "main": [
+        []
+      ]
+    },
+    "Delete row": {
+      "ai_tool": [
+        [
+          {
+            "node": "GOOGLE SPREEDSHEETS",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "GOOGLE SPREEDSHEETS",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "update": {
+      "ai_tool": [
+        [
+          {
+            "node": "GOOGLE SPREEDSHEETS",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read": {
+      "ai_tool": [
+        [
+          {
+            "node": "GOOGLE SPREEDSHEETS",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete File": {
+      "ai_tool": [
+        [
+          {
+            "node": "GOOGLE SPREEDSHEETS",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row": {
+      "ai_tool": [
+        [
+          {
+            "node": "GOOGLE SPREEDSHEETS",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "GOOGLE SPREEDSHEETS",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "message": "Create the file sasa and the columns sarasa,lele,pele,fifi"
+      }
+    ]
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "919e96d1e977fb9355092c3c317df2deed08af20cde05c8987b8216daea6fe6b"
+  }
+}
