@@ -1,0 +1,221 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 2
+            }
+          ]
+        }
+      },
+      "id": "d0e4f2a1-b3c2-4e5d-8a9f-c7e8d6b5a4c3",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        -280,
+        40
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "jsCode": "// Leer el archivo de reunión activa\nconst fs = require('fs');\nconst path = require('path');\n\n// Ruta al archivo que almacena la información de la reunión activa\nconst filePath = path.join(__dirname, '..', 'data', 'active_meeting.json');\n\ntry {\n  // Verificar si el archivo existe\n  if (fs.existsSync(filePath)) {\n    // Leer y parsear el archivo\n    const fileContent = fs.readFileSync(filePath, 'utf8');\n    const meetingData = JSON.parse(fileContent);\n    \n    // Verificar si hay una reunión activa y no ha sido procesada\n    if (meetingData && meetingData.meeting_id && meetingData.status === 'active') {\n      return [{ json: { meeting_id: meetingData.meeting_id } }];\n    }\n  }\n  \n  // Si no hay reunión activa o el archivo no existe, no hacer nada\n  return [];\n} catch (error) {\n  console.error('Error al leer el archivo de reunión activa:', error);\n  return [];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -60,
+        40
+      ],
+      "id": "a1b2c3d4-e5f6-4a5b-8c7d-9e8f7a6b5c4d",
+      "name": "Read Active Meeting"
+    },
+    {
+      "parameters": {
+        "url": "https://gateway.dev.vexa.ai/bots/status",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "blgbAddsL2M7O5YZi2iUH4RVZdzcnm1zC8kKWvxI"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        160,
+        40
+      ],
+      "id": "f1e2d3c4-b5a6-4c7d-8e9f-0a1b2c3d4e5f",
+      "name": "Check Bot Status"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a7b8c9d0-e1f2-4g3h-5i6j-7k8l9m0n1o2",
+              "leftValue": "={{ $('Check Bot Status').item.json.running_bots }}",
+              "rightValue": "",
+              "operator": {
+                "type": "array",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        380,
+        40
+      ],
+      "id": "p1q2r3s4-t5u6-4v7w-8x9y-0z1a2b3c4d5e",
+      "name": "Is Meeting Over"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Reunión terminada, actualizar el estado\nconst fs = require('fs');\nconst path = require('path');\n\n// Ruta al archivo que almacena la información de la reunión activa\nconst filePath = path.join(__dirname, '..', 'data', 'active_meeting.json');\n\ntry {\n  // Verificar si el archivo existe\n  if (fs.existsSync(filePath)) {\n    // Leer y parsear el archivo\n    const fileContent = fs.readFileSync(filePath, 'utf8');\n    const meetingData = JSON.parse(fileContent);\n    \n    // Actualizar el estado a 'ready_for_transcript'\n    meetingData.status = 'ready_for_transcript';\n    \n    // Guardar el archivo actualizado\n    fs.writeFileSync(filePath, JSON.stringify(meetingData, null, 2));\n    \n    return [{ json: { meeting_id: meetingData.meeting_id } }];\n  }\n  \n  return [];\n} catch (error) {\n  console.error('Error al actualizar el estado de la reunión:', error);\n  return [];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        600,
+        -40
+      ],
+      "id": "g1h2i3j4-k5l6-4m7n-8o9p-0q1r2s3t4u5v",
+      "name": "Update Meeting Status"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "j6FDkqe9XbIg9x2o",
+          "mode": "list",
+          "cachedResultName": "MasterRose — get transcripts"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "query": "={{ JSON.stringify({meeting_id: $json.meeting_id}) }}"
+          },
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.1,
+      "position": [
+        820,
+        -40
+      ],
+      "id": "w1x2y3z4-a5b6-4c7d-8e9f-0g1h2i3j4k5l",
+      "name": "Execute Get Transcripts"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Marcar la reunión como procesada\nconst fs = require('fs');\nconst path = require('path');\n\n// Ruta al archivo que almacena la información de la reunión activa\nconst filePath = path.join(__dirname, '..', 'data', 'active_meeting.json');\n\ntry {\n  // Verificar si el archivo existe\n  if (fs.existsSync(filePath)) {\n    // Leer y parsear el archivo\n    const fileContent = fs.readFileSync(filePath, 'utf8');\n    const meetingData = JSON.parse(fileContent);\n    \n    // Actualizar el estado a 'processed'\n    meetingData.status = 'processed';\n    meetingData.processed_at = new Date().toISOString();\n    \n    // Guardar el archivo actualizado\n    fs.writeFileSync(filePath, JSON.stringify(meetingData, null, 2));\n    \n    return [{ json: { message: 'Transcripción completada y reunión marcada como procesada', meeting_id: meetingData.meeting_id } }];\n  }\n  \n  return [];\n} catch (error) {\n  console.error('Error al marcar la reunión como procesada:', error);\n  return [];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        -40
+      ],
+      "id": "m1n2o3p4-q5r6-4s7t-8u9v-0w1x2y3z4a5b",
+      "name": "Mark As Processed"
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Read Active Meeting",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Active Meeting": {
+      "main": [
+        [
+          {
+            "node": "Check Bot Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Bot Status": {
+      "main": [
+        [
+          {
+            "node": "Is Meeting Over",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Meeting Over": {
+      "main": [
+        [
+          {
+            "node": "Update Meeting Status",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Update Meeting Status": {
+      "main": [
+        [
+          {
+            "node": "Execute Get Transcripts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Get Transcripts": {
+      "main": [
+        [
+          {
+            "node": "Mark As Processed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "919e96d1e977fb9355092c3c317df2deed08af20cde05c8987b8216daea6fe6b"
+  }
+}

@@ -1,0 +1,212 @@
+{
+    "nodes": [
+      {
+        "parameters": {
+          "inputSource": "passthrough"
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          -280,
+          40
+        ],
+        "id": "14886921-6b2f-445e-b83e-e5f3787da1fa",
+        "name": "When Executed by Another Workflow"
+      },
+      {
+        "parameters": {
+          "jsCode": "return [{ json: JSON.parse($input.all()[0].json.query) }];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -100,
+          40
+        ],
+        "id": "52c3e460-a0df-4679-bc16-add7683c2121",
+        "name": "FormatInput"
+      },
+      {
+        "parameters": {
+          "url": "https://gateway.dev.vexa.ai/bots/status",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "X-API-Key",
+                "value": "blgbAddsL2M7O5YZi2iUH4RVZdzcnm1zC8kKWvxI"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          120,
+          40
+        ],
+        "id": "1cd0869a-f458-4847-b277-301c2aa8a1b9",
+        "name": "get bot status"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "b511891d-1d37-4352-9c80-3648816fdfa1",
+                "leftValue": "={{ $('get bot status').item.json.running_bots }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "array",
+                  "operation": "empty",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          360,
+          40
+        ],
+        "id": "4af8e560-c46a-4122-b48c-b4e58c07b15f",
+        "name": "If"
+      },
+      {
+        "parameters": {
+          "keepOnlySet": true,
+          "values": {
+            "string": [
+              {
+                "name": "status",
+                "value": "inactive"
+              },
+              {
+                "name": "message",
+                "value": "La reunión ha terminado"
+              }
+            ],
+            "boolean": [
+              {
+                "name": "meeting_over",
+                "value": true
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 2,
+        "position": [
+          680,
+          -40
+        ],
+        "id": "3d85fc5c-2996-440f-8a38-b71b7060d05d",
+        "name": "Set Meeting Over Response",
+        "alwaysOutputData": true,
+        "executeOnce": false
+      },
+      {
+        "parameters": {
+          "keepOnlySet": true,
+          "values": {
+            "string": [
+              {
+                "name": "status",
+                "value": "active"
+              },
+              {
+                "name": "message",
+                "value": "La reunión está activa"
+              }
+            ],
+            "boolean": [
+              {
+                "name": "meeting_over",
+                "value": false
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 2,
+        "position": [
+          680,
+          160
+        ],
+        "id": "563e4563-0f60-4912-a587-48583f32aefb",
+        "name": "Set Meeting Active Response",
+        "alwaysOutputData": true,
+        "executeOnce": false
+      }
+    ],
+    "connections": {
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "FormatInput",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "FormatInput": {
+        "main": [
+          [
+            {
+              "node": "get bot status",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "get bot status": {
+        "main": [
+          [
+            {
+              "node": "If",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If": {
+        "main": [
+          [
+            {
+              "node": "Set Meeting Over Response",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Set Meeting Active Response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "pinData": {},
+    "meta": {
+      "instanceId": "919e96d1e977fb9355092c3c317df2deed08af20cde05c8987b8216daea6fe6b"
+    }
+  }

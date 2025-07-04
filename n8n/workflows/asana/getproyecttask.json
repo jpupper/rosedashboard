@@ -1,0 +1,107 @@
+{
+    "nodes": [
+      {
+        "parameters": {
+          "url": "=https://app.asana.com/api/1.0/projects/{{ $json.gid }}/tasks",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "asanaOAuth2Api",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Accept",
+                "value": "application/json"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          -40,
+          20
+        ],
+        "id": "3f9762f5-c547-43fd-852c-f3cad8e63980",
+        "name": "GET PROJECT TASKS",
+        "credentials": {
+          "asanaOAuth2Api": {
+            "id": "Ou4hoh9Fx8X5xbwM",
+            "name": "Asana account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "fieldToSplitOut": "data",
+          "options": {}
+        },
+        "name": "Item Lists",
+        "type": "n8n-nodes-base.itemLists",
+        "typeVersion": 3.1,
+        "position": [
+          160,
+          20
+        ]
+      },
+      {
+        "parameters": {
+          "url": "=https://app.asana.com/api/1.0/tasks/{{ $json.gid }}?opt_fields=name,notes,description,completed,due_on,assignee,created_at,modified_at,tags,projects,workspace,parent",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "asanaOAuth2Api",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Accept",
+                "value": "application/json"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          360,
+          20
+        ],
+        "id": "task-details",
+        "name": "GET TASK DETAILS",
+        "credentials": {
+          "asanaOAuth2Api": {
+            "id": "Ou4hoh9Fx8X5xbwM",
+            "name": "Asana account 2"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "GET PROJECT TASKS": {
+        "main": [
+          [
+            {
+              "node": "Item Lists",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Item Lists": {
+        "main": [
+          [
+            {
+              "node": "GET TASK DETAILS",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "pinData": {},
+    "meta": {
+      "instanceId": "919e96d1e977fb9355092c3c317df2deed08af20cde05c8987b8216daea6fe6b"
+    }
+  }

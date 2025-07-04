@@ -1,0 +1,148 @@
+{
+    "nodes": [
+      {
+        "parameters": {
+          "keepOnlySet": true,
+          "values": {
+            "string": [
+              {
+                "name": "message",
+                "value": "Transcripción obtenida exitosamente"
+              },
+              {
+                "name": "meeting_id",
+                "value": "={{ $json.meeting_id }}"
+              },
+              {
+                "name": "transcript_data",
+                "value": "={{ $json }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 2,
+        "position": [
+          600,
+          40
+        ],
+        "id": "b9b34886-ffe3-4ad6-8ca7-45d2be28d5d0",
+        "name": "Format Transcript Response",
+        "alwaysOutputData": true,
+        "executeOnce": false
+      },
+      {
+        "parameters": {
+          "jsCode": "return [{ json: JSON.parse($input.all()[0].json.query) }];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          60,
+          40
+        ],
+        "id": "d2edbc02-6f50-48fa-b7b5-d06a104f98c3",
+        "name": "FormatInput"
+      },
+      {
+        "parameters": {
+          "url": "=https://gateway.dev.vexa.ai/transcripts/google_meet/{{ $json.meeting_id }}",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "X-API-Key",
+                "value": "blgbAddsL2M7O5YZi2iUH4RVZdzcnm1zC8kKWvxI"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          300,
+          40
+        ],
+        "id": "41b372b3-26bb-4bdd-9bbe-00f8f596c5a9",
+        "name": "get transcripts"
+      },
+      {
+        "parameters": {
+          "inputSource": "passthrough"
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          -160,
+          40
+        ],
+        "id": "0c99aa30-2984-4aa1-a0de-91c5161e42d0",
+        "name": "When Executed by Another Workflow"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Guardar en el registro que se ha obtenido la transcripción\nconst now = new Date();\nconst timestamp = now.toISOString();\n\n// Añadir información de procesamiento\nconst data = $input.all()[0].json;\ndata.processed_at = timestamp;\ndata.status = 'completed';\n\nreturn [{ json: data }];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          450,
+          40
+        ],
+        "id": "f5a23c01-8d7e-4b9a-a1c5-d8e7f2a9b456",
+        "name": "Process Transcript"
+      }
+    ],
+    "connections": {
+      "FormatInput": {
+        "main": [
+          [
+            {
+              "node": "get transcripts",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "get transcripts": {
+        "main": [
+          [
+            {
+              "node": "Process Transcript",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "FormatInput",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Process Transcript": {
+        "main": [
+          [
+            {
+              "node": "Format Transcript Response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "pinData": {},
+    "meta": {
+      "instanceId": "919e96d1e977fb9355092c3c317df2deed08af20cde05c8987b8216daea6fe6b"
+    }
+  }

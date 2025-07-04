@@ -1,0 +1,168 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -460,
+        -20
+      ],
+      "id": "169416a0-c424-4f19-bbf6-35465ac5a370",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "message",
+              "value": "={{ $json }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        820,
+        0
+      ],
+      "id": "c9849355-8a48-43aa-9643-87b4226b38b5",
+      "name": "Set Success Response2",
+      "alwaysOutputData": true,
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: JSON.parse($input.all()[0].json.query) }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        100,
+        0
+      ],
+      "id": "3a031a28-e554-4eea-b7f3-9f763705844f",
+      "name": "FormatInput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://gateway.dev.vexa.ai/bots",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "blgbAddsL2M7O5YZi2iUH4RVZdzcnm1zC8kKWvxI"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "platform",
+              "value": "google_meet"
+            },
+            {
+              "name": "native_meeting_id",
+              "value": "={{ $json.meeting_id }}"
+            },
+            {
+              "name": "language",
+              "value": "en"
+            },
+            {
+              "name": "bot_name",
+              "value": "SeedRose"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        320,
+        0
+      ],
+      "id": "da15b8e5-621a-4a27-97b4-afc7575bc7bc",
+      "name": "send bot to a meeting"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Guardar información de la reunión activa\nconst fs = require('fs');\nconst path = require('path');\n\n// Crear directorio data si no existe\nconst dataDir = path.join(__dirname, '..', 'data');\nif (!fs.existsSync(dataDir)) {\n  try {\n    fs.mkdirSync(dataDir, { recursive: true });\n  } catch (error) {\n    console.error('Error al crear directorio data:', error);\n  }\n}\n\n// Ruta al archivo que almacenará la información de la reunión activa\nconst filePath = path.join(dataDir, 'active_meeting.json');\n\n// Datos de la reunión\nconst meetingData = {\n  meeting_id: $json.meeting_id,\n  status: 'active',\n  started_at: new Date().toISOString()\n};\n\ntry {\n  // Guardar los datos en el archivo\n  fs.writeFileSync(filePath, JSON.stringify(meetingData, null, 2));\n  \n  // Pasar los datos a la siguiente etapa\n  return [{\n    json: {\n      message: 'Bot enviado a la reunión y datos guardados correctamente',\n      meeting_id: $json.meeting_id,\n      status: 'active'\n    }\n  }];\n} catch (error) {\n  console.error('Error al guardar los datos de la reunión:', error);\n  return [{\n    json: {\n      message: 'Bot enviado a la reunión pero hubo un error al guardar los datos',\n      meeting_id: $json.meeting_id,\n      error: error.message\n    }\n  }];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        540,
+        0
+      ],
+      "id": "b5c4d3e2-a1f0-4g9h-8i7j-6k5l4m3n2o1p",
+      "name": "Save Meeting Data"
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "FormatInput",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FormatInput": {
+      "main": [
+        [
+          {
+            "node": "send bot to a meeting",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "send bot to a meeting": {
+      "main": [
+        [
+          {
+            "node": "Save Meeting Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Meeting Data": {
+      "main": [
+        [
+          {
+            "node": "Set Success Response2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "query": "{\"meeting_id\": \"zcv-uagp-myf\"}"
+      }
+    ]
+  },
+  "meta": {
+    "instanceId": "919e96d1e977fb9355092c3c317df2deed08af20cde05c8987b8216daea6fe6b"
+  }
+}

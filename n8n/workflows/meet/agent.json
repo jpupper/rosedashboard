@@ -1,0 +1,350 @@
+{
+    "nodes": [
+      {
+        "parameters": {
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          -2120,
+          1120
+        ],
+        "id": "c9cc5e32-3a2a-4682-96ca-76cad0013506",
+        "name": "When chat message received",
+        "webhookId": "a1a61f19-0768-42ce-940c-3882b33017ff"
+      },
+      {
+        "parameters": {
+          "content": "##ASANA AGENT",
+          "height": 80
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -1700,
+          1000
+        ],
+        "id": "5d9be3a5-b047-4dff-866b-c820a7cbf067",
+        "name": "ASANA AGENT3"
+      },
+      {
+        "parameters": {
+          "modelName": "models/gemini-2.5-flash",
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+        "typeVersion": 1,
+        "position": [
+          -1960,
+          1420
+        ],
+        "id": "408505f1-4200-449a-abf5-9d52a7c0a653",
+        "name": "Google Gemini Chat Model1",
+        "credentials": {
+          "googlePalmApi": {
+            "id": "qgvevjryXSratZ8f",
+            "name": "Google Gemini(PaLM) Api account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "Eres un asistente especializado en gestionar reuniones de Google Meet. Puedes realizar las siguientes acciones:\n\n1. Enviar un bot a una reunión de Google Meet usando la herramienta 'send bot to a meeting'\n2. Verificar el estado del bot en una reunión usando la herramienta 'Get bot status'\n3. Obtener transcripciones de reuniones finalizadas usando la herramienta 'Get Transcripts'\n\nIMPORTANTE: Cuando envías el bot a una reunión, se inicia automáticamente un proceso de monitoreo que verificará periódicamente si la reunión ha terminado. Cuando la reunión termine, el sistema obtendrá automáticamente las transcripciones sin necesidad de que el usuario lo solicite.\n\nSi el usuario pregunta sobre el estado de una reunión, usa la herramienta 'Get bot status' para verificarlo.\n\n{{ $json }}",
+          "options": {
+            "systemMessage": "You are the Meeting Bot, designed to manage and facilitate meetings. You can send yourself to existing meetings, get the status of ongoing meetings, list upcoming or past meetings, stop active meetings, and configure bot settings.\n\n### ⚠️ CRITICAL RULES ⚠️\n1. ALWAYS provide clear and concise responses based on the task result.\n2. Handle errors gracefully with clear explanations.\n3. Confirm actions after successful execution.\n4. If a meeting ID is ambiguous, ask for clarification.\n5. When the user provides a Google Meet URL (e.g., \"https://meet.google.com/xyz-abcd-efg\"), ALWAYS extract ONLY the meeting ID (e.g., \"xyz-abcd-efg\") and use it for `meeting_id` parameters.\n\n## TOOLS AND OPERATIONS\n\n### 1. Stop Bot\n**Description:** Stops the bot's current operation or ends an active meeting it's currently in.\n**When to Use:** When the user explicitly requests to stop the bot or end a specific meeting the bot is attending.\n**Parameters:**\n- `meeting_id` (optional): The ID of the meeting to stop. If not provided, assume the request is to stop the bot's current task or current active meeting.\n**Error Handling:** If the meeting ID is invalid or the meeting is not active (or the bot is not in it), explain clearly.\n**Example Input:**\n```json\n{\n  \"meeting_id\": \"meeting123\"\n}\n````\n\n### 2\\. Send Bot to a Meeting\n\n**Description:** Sends the bot to an existing meeting. This tool *only* takes the meeting ID.\n**When to Use:** When the user provides a direct request to join a meeting using its ID or a Google Meet link.\n**Parameters:**\n\n  - `meeting_id` (REQUIRED): The unique ID of the meeting (e.g., `abc-defg-hij` for `meet.google.com/abc-defg-hij`).\n    **Input Handling Rules:**\n\n<!-- end list -->\n\n1.  If a full Google Meet URL is provided (e.g., \"https://www.google.com/search?q=https://meet.google.com/zcv-uagp-myf%3Fpli%3D1\"), extract only the meeting ID part (e.g., \"zcv-uagp-myf\").\n2.  If a meeting ID is provided directly, use it as is.\n3.  This tool **DOES NOT** schedule new meetings. It only sends the bot to an *existing* meeting.\n    **Error Handling:** If the `meeting_id` is missing or cannot be extracted, prompt the user for a valid meeting ID or link.\n    **Example Input:**\n\n<!-- end list -->\n\n```json\n{\n  \"meeting_id\": \"zcv-uagp-myf\"\n}\n```\n\n### 3\\. Get Bot Status\n\n**Description:** Retrieves the current operational status of the bot or a specific meeting the bot is involved in.\n**When to Use:** When the user asks about the bot's activity or the status of a meeting.\n**Parameters:**\n\n  - `meeting_id` (optional): The ID of a specific meeting to get status for. If not provided, returns the bot's general status.\n    **Error Handling:** If the meeting ID is invalid, inform the user.\n    **Example Input:**\n\n<!-- end list -->\n\n```json\n{\n  \"meeting_id\": \"meeting456\"\n}\n```\n\n### 4\\. List Meetings\n\n**Description:** Provides a list of scheduled, ongoing, or past meetings that the bot is aware of or has participated in.\n**When to Use:** When the user asks to see a list of meetings.\n**Parameters:**\n\n  - `status` (optional): Filter meetings by status (e.g., \"scheduled\", \"active\", \"completed\"). Defaults to all meetings if not specified.\n  - `limit` (optional): The maximum number of meetings to return.\n    **Error Handling:** If the status filter is invalid, suggest valid options.\n    **Example Input:**\n\n<!-- end list -->\n\n```json\n{\n  \"status\": \"scheduled\",\n  \"limit\": 5\n}\n```\n\n### 5\\. Update Bot Config\n\n**Description:** Modifies the bot's configuration settings.\n**When to Use:** When the user requests to change how the bot operates (e.g., notification preferences, default behaviors).\n**Parameters:**\n\n  - `setting_name` (REQUIRED): The name of the setting to update.\n  - `setting_value` (REQUIRED): The new value for the setting.\n    **Error Handling:** If the setting name is unknown or the value is invalid, provide appropriate feedback.\n    **Example Input:**\n\n<!-- end list -->\n\n```json\n{\n  \"setting_name\": \"notification_preference\",\n  \"setting_value\": \"silent\"\n}\n```\n\n-----\n\n## EXAMPLES\n\n### Example 1: Sending Bot to an Existing Meeting\n\n**User:** \"Send the bot to https://www.google.com/url?sa=E\\&source=gmail\\&q=https://meet.google.com/xyz-abcd-efg\"\n\n**Bot:** \"Sending the bot to the meeting with ID 'xyz-abcd-efg'.\"\n[Uses `send_to_meeting` tool with `meeting_id: \"xyz-abcd-efg\"`]\n\"The bot has successfully joined the meeting 'xyz-abcd-efg'.\"\n\n### Example 2: Getting Bot Status\n\n**User:** \"What are you doing right now?\"\n\n**Bot:** \"I'm currently awaiting instructions. I'm ready to help you manage or get information about meetings.\"\n[Uses `get_bot_status` tool without `meeting_id` parameter]\n\n### Example 3: Listing Meetings\n\n**User:** \"Show me my upcoming meetings.\"\n\n**Bot:** \"Let me fetch your scheduled meetings.\"\n[Uses `list_meetings` tool with `status: scheduled` and `limit: (default)`]\n\"Here are your upcoming meetings:\n\n  - 'Project Alpha Standup' on July 5, 2025, at 9:00 AM (30 minutes)\n  - 'Client Demo' on July 6, 2025, at 11:00 AM (60 minutes)\"\n\n### Example 4: Stopping a Meeting\n\n**User:** \"End the meeting.\"\n\n**Bot:** \"Ending the current active meeting.\"\n[Uses `stop_bot` tool without `meeting_id` (assumes current meeting)]\n\"The meeting has been successfully ended.\"\n\n### Example 5: Updating Bot Configuration\n\n**User:** \"Can you make the default notification preference 'verbose'?\"\n\n**Bot:** \"Certainly, I'll update your notification preference.\"\n[Uses `update_bot_config` tool]\n\"The default notification preference has been updated to 'verbose'.\"\n",
+            "maxIterations": 2,
+            "returnIntermediateSteps": false,
+            "passthroughBinaryImages": true,
+            "batching": {
+              "batchSize": 1,
+              "delayBetweenBatches": 0
+            }
+          }
+        },
+        "name": "BOT MEET AGENT",
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "position": [
+          -1700,
+          1120
+        ],
+        "id": "d25a52dc-9ec4-4e9d-b3bb-e74ee6dc724d",
+        "typeVersion": 2
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "2HU1OwzGp5pGFxzG",
+            "mode": "list",
+            "cachedResultName": "MasterRose — get bot status"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {},
+            "matchingColumns": [],
+            "schema": [],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+        "typeVersion": 2.2,
+        "position": [
+          -1540,
+          1420
+        ],
+        "id": "87bc8b7c-578f-45bf-b51b-9809386ed76f",
+        "name": "Get bot status"
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "a3gwTgSjzUczdtNJ",
+            "mode": "list",
+            "cachedResultName": "MasterRose — list meetings"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {},
+            "matchingColumns": [],
+            "schema": [],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+        "typeVersion": 2.2,
+        "position": [
+          -1400,
+          1420
+        ],
+        "id": "eca2bcf5-493e-4521-9307-d7300a02a612",
+        "name": "List Meetings"
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "EfdxX0jCFTvG434M",
+            "mode": "list",
+            "cachedResultName": "MasterRose — update bot config"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {},
+            "matchingColumns": [],
+            "schema": [],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+        "typeVersion": 2.2,
+        "position": [
+          -1260,
+          1420
+        ],
+        "id": "a3d8ded7-179e-4a31-ba26-f86e6e2b2f1a",
+        "name": "update bot config"
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "QgNKOgL4ANZKaHL1",
+            "mode": "list",
+            "cachedResultName": "MasterRose — send bot to a meeting"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {},
+            "matchingColumns": [],
+            "schema": [],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+        "typeVersion": 2.2,
+        "position": [
+          -1680,
+          1420
+        ],
+        "id": "ec7d4d49-8140-4a2b-bb85-c40e0e777141",
+        "name": "send bot to a meeting"
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "BhGNsnhyJyNxCtUz",
+            "mode": "list",
+            "cachedResultName": "MasterRose — stop bot"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {},
+            "matchingColumns": [],
+            "schema": [],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+        "typeVersion": 2.2,
+        "position": [
+          -1140,
+          1420
+        ],
+        "id": "7a1f2621-d21f-41a9-ae5e-7c81800c5c67",
+        "name": "stop bot"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.myNewField = 1;\n}\n\nreturn $input.all();"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -1060,
+          1120
+        ],
+        "id": "346099cd-4ce4-412c-bf9f-d01b49711f39",
+        "name": "Code"
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "j6FDkqe9XbIg9x2o",
+            "mode": "list",
+            "cachedResultName": "MasterRose — get transcripts"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {},
+            "matchingColumns": [],
+            "schema": [],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+        "typeVersion": 2.2,
+        "position": [
+          -1000,
+          1420
+        ],
+        "id": "313ac68f-1402-4fbd-b855-a5d77ab832df",
+        "name": "Get Transcripts"
+      }
+    ],
+    "connections": {
+      "When chat message received": {
+        "main": [
+          [
+            {
+              "node": "BOT MEET AGENT",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Google Gemini Chat Model1": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "BOT MEET AGENT",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "BOT MEET AGENT": {
+        "main": [
+          [
+            {
+              "node": "Code",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get bot status": {
+        "ai_tool": [
+          [
+            {
+              "node": "BOT MEET AGENT",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "List Meetings": {
+        "ai_tool": [
+          [
+            {
+              "node": "BOT MEET AGENT",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "update bot config": {
+        "ai_tool": [
+          [
+            {
+              "node": "BOT MEET AGENT",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "send bot to a meeting": {
+        "ai_tool": [
+          [
+            {
+              "node": "BOT MEET AGENT",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "stop bot": {
+        "ai_tool": [
+          [
+            {
+              "node": "BOT MEET AGENT",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Transcripts": {
+        "ai_tool": [
+          [
+            {
+              "node": "BOT MEET AGENT",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "pinData": {},
+    "meta": {
+      "instanceId": "919e96d1e977fb9355092c3c317df2deed08af20cde05c8987b8216daea6fe6b"
+    }
+  }
