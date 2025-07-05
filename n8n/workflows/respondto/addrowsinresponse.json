@@ -1,0 +1,155 @@
+{
+    "nodes": [
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "ab17afb3-3892-4036-af42-c1a6f2f2f358",
+                "name": "documentName",
+                "value": "chathistory",
+                "type": "string"
+              },
+              {
+                "id": "f9aac1c9-54f6-4b5c-98cb-a7e97afa0941",
+                "name": "spreadsheetId",
+                "value": "1HU8fWYp2f921rPBUd55a7EhcImjhXhwPlOftKGh563E",
+                "type": "string"
+              },
+              {
+                "id": "109cdc0a-cb38-42cb-b72f-ce96828edd4e",
+                "name": "sheetName",
+                "value": "Sheet1",
+                "type": "string"
+              },
+              {
+                "id": "7ab83544-b3bc-471c-9d97-5ee1b131b13d",
+                "name": "columns",
+                "value": "",
+                "type": "string"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          460,
+          -100
+        ],
+        "id": "fb2b1bc0-c934-4e9c-835a-532847317455",
+        "name": "MapToSheet"
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "rr6kagq3miQ1jRb5",
+            "mode": "list",
+            "cachedResultName": "MasterRose — addRowsSheets"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {},
+            "matchingColumns": [],
+            "schema": [],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": true
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.2,
+        "position": [
+          860,
+          -220
+        ],
+        "id": "6a256a4c-0c1f-42be-857c-cd5cc5ef6767",
+        "name": "addRows"
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          280,
+          -240
+        ],
+        "id": "9ad7a5c4-66d2-42de-b7b0-dff1926ed88e",
+        "name": "columns"
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3.2,
+        "position": [
+          640,
+          -220
+        ],
+        "id": "f517f34d-bd1b-4b76-9984-404503127a6c",
+        "name": "Merge"
+      }
+    ],
+    "connections": {
+      "MapToSheet": {
+        "main": [
+          [
+            {
+              "node": "Merge",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "addRows": {
+        "main": [
+          []
+        ]
+      },
+      "columns": {
+        "main": [
+          [
+            {
+              "node": "MapToSheet",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Merge",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Merge": {
+        "main": [
+          [
+            {
+              "node": "addRows",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "pinData": {
+      "MapToSheet": [
+        {
+          "documentName": "chathistory",
+          "spreadsheetId": "1HU8fWYp2f921rPBUd55a7EhcImjhXhwPlOftKGh563E",
+          "sheetName": "Sheet1"
+        }
+      ]
+    },
+    "meta": {
+      "templateCredsSetupCompleted": true,
+      "instanceId": "919e96d1e977fb9355092c3c317df2deed08af20cde05c8987b8216daea6fe6b"
+    }
+  }

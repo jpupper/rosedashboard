@@ -1,1 +1,0 @@
-return [{ json: JSON.parse($input.all()[0].json.query) }];
